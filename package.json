@@ -7,17 +7,24 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:prod": "NODE_ENV=production tsc -b && vite build --mode production",
     "preview": "vite preview",
+    "lint": "tsc --noEmit",
     "cap:sync": "npm run build && npx cap sync android",
+    "cap:sync:prod": "npm run build:prod && npx cap sync android",
     "cap:android": "npx cap run android",
-    "cap:open:android": "npx cap open android"
+    "cap:open:android": "npx cap open android",
+    "cap:build:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
+    "cap:build:release": "npm run cap:sync:prod && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.2",
     "@capacitor/core": "^8.0.2",
+    "@capacitor/preferences": "^8.0.0",
     "@ionic/react": "^8.0.0",
     "@ionic/react-router": "^8.0.0",
     "axios": "^1.7.0",
+    "axios-retry": "^4.5.0",
     "ionicons": "^7.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

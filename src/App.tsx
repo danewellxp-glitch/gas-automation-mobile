@@ -1,47 +1,128 @@
-import React from 'react'
-import { IonRouterOutlet } from '@ionic/react'
+/**
+ * App Root Component
+ *
+ * Configuração de rotas, providers e error boundary.
+ * Lazy loading de páginas para melhor performance.
+ */
+
+import React, { Suspense, lazy } from 'react'
+import { IonRouterOutlet, IonSpinner } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
 import { Redirect, Route } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import DeliveryList from './pages/DeliveryList'
-import DeliveryDetail from './pages/DeliveryDetail'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
+// ============================================================================
+// LAZY LOADING
+// ============================================================================
+
+/**
+ * Páginas carregadas sob demanda
+ * Reduz bundle inicial e melhora tempo de carregamento
+ */
+const Login = lazy(() => import('./pages/Login'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const DeliveryList = lazy(() => import('./pages/DeliveryList'))
+const DeliveryDetail = lazy(() => import('./pages/DeliveryDetail'))
+
+// ============================================================================
+// LOADING FALLBACK
+// ============================================================================
+
+/**
+ * Componente de loading durante lazy load
+ */
+function PageLoading() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'var(--ion-background-color)',
+      }}
+    >
+      <IonSpinner name="crescent" color="primary" />
+    </div>
+  )
+}
+
+// ============================================================================
+// ROUTE GUARD
+// ============================================================================
+
+/**
+ * Componente de rota protegida
+ * Redireciona para login se não autenticado
+ */
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
-  if (isLoading) return null
-  if (!isAuthenticated) return <Redirect to="/login" />
+
+  if (isLoading) {
+    return <PageLoading />
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect to="/login" />
+  }
+
   return <>{children}</>
 }
 
+// ============================================================================
+// ROUTER
+// ============================================================================
+
+/**
+ * Workaround para tipagem do IonReactRouter
+ */
 const IonRouter = IonReactRouter as React.ComponentType<{ children?: React.ReactNode }>
 
+/**
+ * Configuração de rotas do app
+ */
 function AppRoutes() {
   return (
     <IonRouter>
       <IonRouterOutlet>
+        {/* Rota pública */}
         <Route path="/login" exact>
-          <Login />
+          <Suspense fallback={<PageLoading />}>
+            <Login />
+          </Suspense>
         </Route>
+
+        {/* Rotas protegidas */}
         <Route path="/dashboard" exact>
           <PrivateRoute>
-            <Dashboard />
+            <Suspense fallback={<PageLoading />}>
+              <Dashboard />
+            </Suspense>
           </PrivateRoute>
         </Route>
+
         <Route path="/deliveries" exact>
           <PrivateRoute>
-            <DeliveryList />
+            <Suspense fallback={<PageLoading />}>
+              <DeliveryList />
+            </Suspense>
           </PrivateRoute>
         </Route>
+
         <Route path="/delivery/:id" exact>
           <PrivateRoute>
-            <DeliveryDetail />
+            <Suspense fallback={<PageLoading />}>
+              <DeliveryDetail />
+            </Suspense>
           </PrivateRoute>
         </Route>
+
+        {/* Redirects */}
         <Route path="/" exact>
           <Redirect to="/dashboard" />
         </Route>
+
         <Route path="*">
           <Redirect to="/dashboard" />
         </Route>
@@ -50,10 +131,16 @@ function AppRoutes() {
   )
 }
 
+// ============================================================================
+// APP
+// ============================================================================
+
 export default function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
