@@ -1,0 +1,7 @@
+{
+  "name": "Gas Driver",
+  "type": "react",
+  "integrations": {
+    "capacitor": {}
+  }
+}

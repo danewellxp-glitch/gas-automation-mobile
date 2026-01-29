@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build output (opcional: descomente se quiser versionar dist)
+# dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ionic
+.ionic/
+
+# Capacitor (gerados pelo sync)
+# android/app/src/main/assets/public é copiado pelo cap sync
