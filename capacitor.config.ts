@@ -1,0 +1,33 @@
+import type { CapacitorConfig } from '@capacitor/cli'
+
+const config: CapacitorConfig = {
+  appId: 'com.gasautomation.driver',
+  appName: 'Gas Driver',
+  webDir: 'dist',
+  bundledWebRuntime: false,
+  android: {
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: true,
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: '#0F172A',
+      androidScaleType: 'CENTER_CROP',
+      showSpinner: true,
+      spinnerColor: '#10B981',
+    },
+  },
+  server: {
+    cleartext: true,
+    androidScheme: 'https',
+    allowNavigation: [
+      '192.168.10.156',
+      'localhost',
+      'http://192.168.10.156:8000',
+    ],
+  },
+}
+
+export default config
