@@ -1,3 +1,6 @@
+// Nome do projeto: usado por Android Studio e ferramentas para encontrar o módulo :app
+rootProject.name = 'GasDriver'
+
 include ':app'
 include ':capacitor-cordova-android-plugins'
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')

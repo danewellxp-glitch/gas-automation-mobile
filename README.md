@@ -72,10 +72,25 @@ npx cap open android
 
 A pasta `dist/` **precisava ter um `index.html`** que carrega o app. Só havia arquivos em `assets/`, então o Capacitor não encontrava a página inicial. Agora `dist/` é preenchido com o build do frontend (index.html + assets). Sempre que atualizar o frontend do driver, rode `./sync-from-frontend.sh` e depois `npx cap sync android`.
 
+## Executar o app no Android (Gemini / ferramentas / CLI)
+
+- **Módulo do app:** `:app` (não use `gas-automation-mobile` como nome de módulo).
+- **Projeto Gradle:** pasta `android/`; nome do projeto: `GasDriver` (em `android/settings.gradle`).
+- **Para implantar:** execute a partir da **pasta `android/`** (não da raiz do repo), ou use o script abaixo.
+
+**Um comando (raiz do repo):**
+```bash
+./run-android.sh
+```
+Isso faz `npx cap sync android` e depois `./gradlew installDebug` em `android/`. O APK é instalado no dispositivo/emulador conectado.
+
+**Se uma ferramenta (ex.: Gemini) não encontrar o módulo:** abra o diretório **`android/`** como projeto (não a raiz) e use o módulo **`:app`** para executar.
+
 ## Scripts
 
 | Comando | Descrição |
 |--------|-----------|
+| `./run-android.sh` | Cap sync + build e instala o app no dispositivo (módulo :app) |
 | `./sync-from-frontend.sh` | Build do frontend (gas-automation) e copia para `dist/` |
 | `npm run cap:sync` | Sincroniza `dist/` com o projeto Android |
 | `npm run cap:open:android` | Abre o projeto no Android Studio |
