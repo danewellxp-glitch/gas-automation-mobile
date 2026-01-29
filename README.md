@@ -36,6 +36,15 @@ npx cap sync android
 npx cap open android
 ```
 
+## Ionic Appflow (build na nuvem)
+
+1. **Tipo do app:** No Appflow o app precisa ser **Capacitor**, não React Native.  
+   Se você criou como "React Native", crie um novo app em [Appflow](https://dashboard.ionicframework.com) como **Capacitor** e conecte este repositório.
+
+2. **App ID:** No `appflow.config.json` troque `YOUR_APPFLOW_APP_ID` pelo ID do app (visível na página do app no Appflow).
+
+3. O `package-lock.json` está atualizado para o runner usar `npm ci` sem erros de dependências opcionais.
+
 ## Scripts
 
 | Comando | Descrição |
