@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema base da aplicação -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#10B981</item>
+        <item name="colorPrimaryDark">#0F172A</item>
+        <item name="colorAccent">#10B981</item>
+    </style>
+
+    <!-- Sem ActionBar (usado pelo Capacitor BridgeActivity) -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Tela de lançamento da MainActivity -->
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+</resources>

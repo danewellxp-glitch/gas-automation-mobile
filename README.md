@@ -86,6 +86,8 @@ Isso faz `npx cap sync android` e depois `./gradlew installDebug` em `android/`.
 
 **Se uma ferramenta (ex.: Gemini) não encontrar o módulo:** abra o diretório **`android/`** como projeto (não a raiz) e use o módulo **`:app`** para executar.
 
+**Antes de abrir no Android Studio pela primeira vez (ou após clonar o repo):** rode na raiz do repo `npx cap sync android` para gerar `capacitor-cordova-android-plugins` e copiar o conteúdo de `dist/` para `android/app/src/main/assets/public/`. Ou use `./run-android.sh`, que já faz o sync antes do build.
+
 ## Scripts
 
 | Comando | Descrição |

@@ -46,4 +46,4 @@ cd android
 - **:capacitor-android** – runtime Capacitor (incluído por `capacitor.settings.gradle`).
 - **:capacitor-cordova-android-plugins** – gerado por `npx cap sync`; não versionado no Git.
 
-Se o build falhar com "capacitor-cordova-android-plugins not found", execute na raiz do repo: `npx cap sync android`.
+Se o build falhar com "capacitor-cordova-android-plugins not found" ou com erros de assets, execute na raiz do repo: `npx cap sync android`. Isso gera `capacitor-cordova-android-plugins` e copia o conteúdo de `dist/` para `app/src/main/assets/public/`.
