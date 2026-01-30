@@ -24,3 +24,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Fix: garante que páginas Ionic fiquem visíveis mesmo sem animação de transição */
+.ion-page {
+  opacity: 1 !important;
+}

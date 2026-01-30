@@ -118,13 +118,9 @@ function AppRoutes() {
           </PrivateRoute>
         </Route>
 
-        {/* Redirects */}
+        {/* Redirect raiz para login (PrivateRoute redireciona de volta se necessário) */}
         <Route path="/" exact>
-          <Redirect to="/dashboard" />
-        </Route>
-
-        <Route path="*">
-          <Redirect to="/dashboard" />
+          <Redirect to="/login" />
         </Route>
       </IonRouterOutlet>
     </IonRouter>
