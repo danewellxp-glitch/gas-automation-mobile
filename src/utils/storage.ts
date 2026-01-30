@@ -106,9 +106,24 @@ let userCache: StoredUser | null = null
  * Inicializa o cache de storage (chamar no boot do app)
  */
 export async function initStorageCache(): Promise<{ token: string | null; user: StoredUser | null }> {
-  tokenCache = await getStoredToken()
-  userCache = await getStoredUser()
-  return { token: tokenCache, user: userCache }
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Storage init timeout')), 5000)
+  )
+  try {
+    const result = await Promise.race([
+      (async () => {
+        tokenCache = await getStoredToken()
+        userCache = await getStoredUser()
+        return { token: tokenCache, user: userCache }
+      })(),
+      timeout,
+    ])
+    return result
+  } catch {
+    tokenCache = null
+    userCache = null
+    return { token: null, user: null }
+  }
 }
 
 /**
