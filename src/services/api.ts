@@ -22,7 +22,11 @@ import { getErrorMessage, isAuthError, logError } from '../utils/errorHandler'
  * URL base da API
  * IMPORTANTE: Em produção, usar variável de ambiente
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.10.156:8000/api'
+/**
+ * No emulador Android, 10.0.2.2 aponta para o host (seu PC).
+ * Em device fisico, usar o IP da rede local (ex: 192.168.10.156).
+ */
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://10.0.2.2:8000/api'
 
 /**
  * Timeout padrão (15 segundos - adequado para 3G/4G)
