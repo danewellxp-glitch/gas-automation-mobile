@@ -10,21 +10,37 @@
     <link rel="stylesheet" crossorigin href="./assets/index-B_exYPih.css">
   </head>
   <body>
+    <div id="app-debug" style="padding:40px;font-family:Arial,sans-serif;background:#111;color:#0f0;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;overflow:auto">
+      <h1 style="color:#0f0;margin:0 0 10px">GAS DRIVER DEBUG</h1>
+      <p id="dbg-status">1. HTML carregou OK</p>
+    </div>
     <div id="root"></div>
     <script>
-      // Debug: mostra erros JS na tela em vez de tela branca
+      // Step 2: inline JS works
+      var dbg = document.getElementById('dbg-status');
+      dbg.innerHTML += '<br>2. Inline JS OK';
+
+      // Step 3: catch any errors
       window.onerror = function(msg, url, line, col, err) {
-        var d = document.getElementById('root');
-        d.innerHTML = '<div style="padding:20px;font-family:monospace;color:red;word-break:break-all">' +
-          '<h2>JS Error</h2><p>' + msg + '</p><p>File: ' + url + ':' + line + ':' + col + '</p>' +
-          (err && err.stack ? '<pre>' + err.stack + '</pre>' : '') + '</div>';
+        dbg.innerHTML += '<br><span style="color:red">ERRO JS: ' + msg + '</span>';
+        dbg.innerHTML += '<br><span style="color:red">Arquivo: ' + url + ':' + line + '</span>';
+        if (err && err.stack) dbg.innerHTML += '<br><pre style="color:red;font-size:11px">' + err.stack + '</pre>';
+        return true;
       };
       window.addEventListener('unhandledrejection', function(e) {
-        var d = document.getElementById('root');
-        d.innerHTML = '<div style="padding:20px;font-family:monospace;color:red;word-break:break-all">' +
-          '<h2>Promise Error</h2><p>' + (e.reason ? (e.reason.message || e.reason) : 'Unknown') + '</p>' +
-          (e.reason && e.reason.stack ? '<pre>' + e.reason.stack + '</pre>' : '') + '</div>';
+        dbg.innerHTML += '<br><span style="color:orange">PROMISE ERRO: ' + (e.reason ? (e.reason.message || e.reason) : 'Unknown') + '</span>';
+        if (e.reason && e.reason.stack) dbg.innerHTML += '<br><pre style="color:orange;font-size:11px">' + e.reason.stack + '</pre>';
       });
+
+      // Step 4: check if module scripts load
+      setTimeout(function() {
+        var root = document.getElementById('root');
+        if (!root.children.length) {
+          dbg.innerHTML += '<br><span style="color:yellow">3. Apos 5s: root ainda vazio - React NAO montou</span>';
+        } else {
+          dbg.innerHTML += '<br><span style="color:lime">3. React montou OK!</span>';
+        }
+      }, 5000);
     </script>
   </body>
 </html>
