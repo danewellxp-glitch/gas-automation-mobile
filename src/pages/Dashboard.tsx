@@ -22,6 +22,7 @@ import { useHistory } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getDriverStats, updateDriverStatus, type DriverStats } from '../services/api'
 import { getErrorMessage, isNetworkError } from '../utils/errorHandler'
+import { startTracking, stopTracking, isTracking } from '../services/locationTracker'
 import { useConfirm, CONFIRM_PRESETS } from '../hooks/useConfirm'
 import { DashboardSkeleton } from '../components/Skeletons'
 import { ErrorState, OfflineState } from '../components/EmptyState'
@@ -137,6 +138,23 @@ export default function Dashboard() {
   useEffect(() => {
     loadStats()
   }, [loadStats])
+
+  // Gerencia GPS tracking baseado no status do driver
+  useEffect(() => {
+    if (!stats) return
+
+    if (stats.status === 'available' || stats.status === 'busy') {
+      if (!isTracking()) {
+        startTracking()
+      }
+    } else {
+      stopTracking()
+    }
+
+    return () => {
+      stopTracking()
+    }
+  }, [stats?.status])
 
   /**
    * Pull-to-refresh

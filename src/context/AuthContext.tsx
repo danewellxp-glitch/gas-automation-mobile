@@ -20,6 +20,7 @@ import {
   setCachedUser,
   type StoredUser,
 } from '../utils/storage'
+import { initPushNotifications, cleanupPushNotifications } from '../services/pushNotifications'
 
 // ============================================================================
 // TYPES
@@ -61,9 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   /**
-   * Logout - limpa cache e storage
+   * Logout - limpa cache, storage e push notifications
    */
   const logout = useCallback(async () => {
+    await cleanupPushNotifications()
     await clearCache()
     setState({ isAuthenticated: false, user: null, isLoading: false })
   }, [])
@@ -109,6 +111,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user: userData,
         isLoading: false,
       })
+
+      // Registra push notifications após login
+      initPushNotifications().catch(() => {})
     } catch (error) {
       setState((s) => ({ ...s, isLoading: false }))
       throw error
@@ -140,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             },
             isLoading: false,
           })
+          initPushNotifications().catch(() => {})
         } else if (mounted) {
           setState((s) => ({ ...s, isLoading: false }))
         }
