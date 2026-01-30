@@ -23,8 +23,9 @@ import { getErrorMessage, isAuthError, logError } from '../utils/errorHandler'
  * IMPORTANTE: Em produção, usar variável de ambiente
  */
 /**
- * URL da API - backend roda no servidor Linux (192.168.10.156)
- * O emulador Android acessa via NAT da rede do host.
+ * URL da API
+ * Emulador Android: 10.0.2.2 → Windows host → port forward → Linux backend
+ * Device fisico: usar IP direto da rede (192.168.10.156)
  */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.10.156:8000/api'
 
