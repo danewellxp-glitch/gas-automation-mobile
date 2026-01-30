@@ -14,6 +14,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonIcon,
   IonPage,
   IonSpinner,
   IonTitle,
@@ -31,11 +32,13 @@ import {
   type DeliveryStatus,
 } from '../services/api'
 import { getErrorMessage, isNetworkError } from '../utils/errorHandler'
+import { openNavigation } from '../utils/navigation'
 import { useConfirm, CONFIRM_PRESETS } from '../hooks/useConfirm'
 import { DeliveryDetailSkeleton } from '../components/Skeletons'
 import { ErrorState, OfflineState, EmptyState } from '../components/EmptyState'
 import { NetworkStatusBanner } from '../components/NetworkStatus'
-import { alertCircleOutline } from 'ionicons/icons'
+import { alertCircleOutline, cameraOutline, navigateOutline } from 'ionicons/icons'
+import { takeDeliveryPhoto, uploadDeliveryProof } from '../services/camera'
 
 // ============================================================================
 // CONSTANTS
@@ -94,17 +97,63 @@ export default function DeliveryDetail() {
 
   /**
    * Atualiza status com confirmação
+   * Para "delivered", exige foto de comprovante antes
    */
   const handleStatusChange = async (status: DeliveryStatus) => {
     if (!id) return
 
-    // Usa preset apropriado ou genérico
+    // Para "entregue", exige foto primeiro
+    if (status === 'delivered') {
+      const { confirmed } = await confirm({
+        header: 'Foto de comprovante',
+        message: 'Tire uma foto como prova de entrega antes de confirmar.',
+        confirmText: 'Tirar foto',
+        cancelText: 'Cancelar',
+      })
+      if (!confirmed) return
+
+      const photo = await takeDeliveryPhoto()
+      if (!photo) {
+        await presentToast({
+          message: 'Foto obrigatoria para confirmar entrega.',
+          duration: 3000,
+          color: 'warning',
+          position: 'top',
+        })
+        return
+      }
+
+      setUpdating(status)
+      try {
+        // Upload da foto
+        await uploadDeliveryProof(id, photo)
+        // Atualiza status
+        await updateDeliveryStatus(id, status)
+        await presentToast({
+          message: 'Entrega confirmada com comprovante!',
+          duration: 2000,
+          color: 'success',
+          position: 'top',
+        })
+        await load()
+      } catch (e: unknown) {
+        await presentToast({
+          message: getErrorMessage(e),
+          duration: 3000,
+          color: 'danger',
+          position: 'top',
+        })
+      } finally {
+        setUpdating(null)
+      }
+      return
+    }
+
+    // Demais status: fluxo normal com confirmação
     const preset =
-      status === 'delivered'
-        ? CONFIRM_PRESETS.completeDelivery
-        : status === 'failed'
-          ? CONFIRM_PRESETS.failDelivery
-          : CONFIRM_PRESETS.changeStatus(getStatusLabel(status))
+      status === 'failed'
+        ? CONFIRM_PRESETS.failDelivery
+        : CONFIRM_PRESETS.changeStatus(getStatusLabel(status))
 
     const { confirmed } = await confirm(preset)
     if (!confirmed) return
@@ -232,6 +281,18 @@ export default function DeliveryDetail() {
                     {delivery.address || delivery.bairro || 'Nao informado'}
                   </h2>
                 </IonLabel>
+                {(delivery.address || delivery.bairro) && (
+                  <IonButton
+                    slot="end"
+                    fill="solid"
+                    color="primary"
+                    size="small"
+                    onClick={() => openNavigation(delivery.address || delivery.bairro || '')}
+                  >
+                    <IonIcon icon={navigateOutline} slot="start" />
+                    Navegar
+                  </IonButton>
+                )}
               </IonItem>
 
               {delivery.customer_name && (
@@ -299,7 +360,12 @@ export default function DeliveryDetail() {
                         {isUpdating ? (
                           <IonSpinner name="crescent" style={{ width: 16, height: 16 }} />
                         ) : (
-                          opt.label
+                          <>
+                            {opt.value === 'delivered' && (
+                              <IonIcon icon={cameraOutline} style={{ marginRight: 4 }} />
+                            )}
+                            {opt.label}
+                          </>
                         )}
                       </IonButton>
                     )
