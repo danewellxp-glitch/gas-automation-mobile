@@ -10,5 +10,20 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Debug: mostra erros JS na tela em vez de tela branca
+      window.onerror = function(msg, url, line, col, err) {
+        var d = document.getElementById('root');
+        d.innerHTML = '<div style="padding:20px;font-family:monospace;color:red;word-break:break-all">' +
+          '<h2>JS Error</h2><p>' + msg + '</p><p>File: ' + url + ':' + line + ':' + col + '</p>' +
+          (err && err.stack ? '<pre>' + err.stack + '</pre>' : '') + '</div>';
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        var d = document.getElementById('root');
+        d.innerHTML = '<div style="padding:20px;font-family:monospace;color:red;word-break:break-all">' +
+          '<h2>Promise Error</h2><p>' + (e.reason ? (e.reason.message || e.reason) : 'Unknown') + '</p>' +
+          (e.reason && e.reason.stack ? '<pre>' + e.reason.stack + '</pre>' : '') + '</div>';
+      });
+    </script>
   </body>
 </html>
