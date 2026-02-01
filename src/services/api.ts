@@ -186,14 +186,23 @@ export type DeliveryStatus =
 export interface Delivery {
   id: string
   order_id: string
+  order_number?: string
   status: DeliveryStatus
-  driver_id?: number
+  driver_id?: string
   driver_name?: string
   bairro?: string
   address?: string
+  delivery_address_str?: string
   customer_name?: string
   customer_phone?: string
   notes?: string
+  order_total?: number
+  order_items?: { product_code: string; product_name: string; quantity: number }[]
+  assigned_at?: string
+  picked_up_at?: string
+  in_transit_at?: string
+  arrived_at?: string
+  delivered_at?: string
   created_at?: string
   updated_at?: string
 }
@@ -267,14 +276,19 @@ export async function getDriverDeliveries(
  */
 export async function getDeliveryById(deliveryId: string): Promise<Delivery | null> {
   try {
-    // Primeiro tenta buscar nas ativas
-    const active = await getDriverDeliveries('active')
-    const found = active.find((d) => d.id === deliveryId)
-    if (found) return found
+    // Busca em todas as categorias
+    const [active, pending, completed] = await Promise.all([
+      getDriverDeliveries('active'),
+      getDriverDeliveries('pending'),
+      getDriverDeliveries('completed'),
+    ])
 
-    // Se não encontrar, busca nas completadas
-    const completed = await getDriverDeliveries('completed')
-    return completed.find((d) => d.id === deliveryId) ?? null
+    return (
+      active.find((d) => d.id === deliveryId) ??
+      pending.find((d) => d.id === deliveryId) ??
+      completed.find((d) => d.id === deliveryId) ??
+      null
+    )
   } catch {
     return null
   }

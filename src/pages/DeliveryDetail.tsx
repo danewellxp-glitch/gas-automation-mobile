@@ -269,7 +269,7 @@ export default function DeliveryDetail() {
                 <IonLabel>
                   <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Pedido</p>
                   <h2 style={{ fontWeight: 600, fontSize: 18, marginTop: 4 }}>
-                    #{String(delivery.order_id || delivery.id).slice(0, 8)}
+                    #{delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}
                   </h2>
                 </IonLabel>
               </IonItem>
@@ -278,16 +278,16 @@ export default function DeliveryDetail() {
                 <IonLabel>
                   <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Endereco / Bairro</p>
                   <h2 style={{ fontSize: 16, marginTop: 4 }}>
-                    {delivery.address || delivery.bairro || 'Nao informado'}
+                    {delivery.delivery_address_str || delivery.address || delivery.bairro || 'Nao informado'}
                   </h2>
                 </IonLabel>
-                {(delivery.address || delivery.bairro) && (
+                {(delivery.delivery_address_str || delivery.address || delivery.bairro) && (
                   <IonButton
                     slot="end"
                     fill="solid"
                     color="primary"
                     size="small"
-                    onClick={() => openNavigation(delivery.address || delivery.bairro || '')}
+                    onClick={() => openNavigation(delivery.delivery_address_str || delivery.address || delivery.bairro || '')}
                   >
                     <IonIcon icon={navigateOutline} slot="start" />
                     Navegar
@@ -312,6 +312,30 @@ export default function DeliveryDetail() {
                       <a href={`tel:${delivery.customer_phone}`} style={{ color: 'var(--ion-color-primary)' }}>
                         {delivery.customer_phone}
                       </a>
+                    </h2>
+                  </IonLabel>
+                </IonItem>
+              )}
+
+              {delivery.order_items && delivery.order_items.length > 0 && (
+                <IonItem>
+                  <IonLabel className="ion-text-wrap">
+                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Itens</p>
+                    {delivery.order_items.map((item, i) => (
+                      <h2 key={i} style={{ fontSize: 14, marginTop: 4 }}>
+                        {item.quantity}x {item.product_name}
+                      </h2>
+                    ))}
+                  </IonLabel>
+                </IonItem>
+              )}
+
+              {delivery.order_total != null && delivery.order_total > 0 && (
+                <IonItem>
+                  <IonLabel>
+                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Valor</p>
+                    <h2 style={{ fontWeight: 600, fontSize: 18, marginTop: 4, color: 'var(--ion-color-success)' }}>
+                      R$ {delivery.order_total.toFixed(2)}
                     </h2>
                   </IonLabel>
                 </IonItem>

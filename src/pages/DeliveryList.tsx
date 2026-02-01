@@ -123,10 +123,10 @@ const DeliveryItem = memo(function DeliveryItem({
       />
       <IonLabel>
         <h2 style={{ fontWeight: 600, fontSize: 16 }}>
-          #{String(delivery.order_id || delivery.id).slice(0, 8)}
+          Pedido #{delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}
         </h2>
         <p style={{ color: 'var(--ion-color-dark)', marginTop: 4 }}>
-          {delivery.bairro || delivery.address || 'Endereco nao informado'}
+          {delivery.delivery_address_str || delivery.bairro || delivery.address || 'Endereco nao informado'}
         </p>
         <p style={{ color: statusColor, fontWeight: 500, marginTop: 2 }}>
           {getStatusLabel(delivery.status)}
