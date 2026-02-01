@@ -13,6 +13,7 @@ import { Capacitor } from '@capacitor/core'
 
 const TOKEN_KEY = 'gas_driver_token'
 const USER_KEY = 'gas_driver_user'
+const DELIVERIES_CACHE_KEY = 'gas_driver_deliveries_cache'
 
 // Detecta se estamos em ambiente nativo (Capacitor)
 const isNative = Capacitor.isNativePlatform()
@@ -163,4 +164,73 @@ export async function clearCache(): Promise<void> {
   tokenCache = null
   userCache = null
   await clearStoredAuth()
+  await clearDeliveriesCache()
+}
+
+// ============================================================================
+// CACHE DE ENTREGAS (para offline)
+// ============================================================================
+
+export interface DeliveriesCacheEntry {
+  status: 'pending' | 'active' | 'completed'
+  data: unknown[]
+  cachedAt: string
+}
+
+/**
+ * Salva entregas no cache
+ */
+export async function setDeliveriesCache(
+  status: 'pending' | 'active' | 'completed',
+  data: unknown[]
+): Promise<void> {
+  const key = `${DELIVERIES_CACHE_KEY}_${status}`
+  const entry: DeliveriesCacheEntry = {
+    status,
+    data,
+    cachedAt: new Date().toISOString(),
+  }
+  const value = JSON.stringify(entry)
+  if (isNative) {
+    await Preferences.set({ key, value })
+  } else {
+    localStorage.setItem(key, value)
+  }
+}
+
+/**
+ * Recupera entregas do cache
+ */
+export async function getDeliveriesCache(
+  status: 'pending' | 'active' | 'completed'
+): Promise<unknown[] | null> {
+  const key = `${DELIVERIES_CACHE_KEY}_${status}`
+  let raw: string | null = null
+  if (isNative) {
+    const { value } = await Preferences.get({ key })
+    raw = value
+  } else {
+    raw = localStorage.getItem(key)
+  }
+  if (!raw) return null
+  try {
+    const entry = JSON.parse(raw) as DeliveriesCacheEntry
+    return Array.isArray(entry.data) ? entry.data : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Invalida cache de entregas (após sincronizar fila)
+ */
+export async function clearDeliveriesCache(): Promise<void> {
+  const keys = ['pending', 'active', 'completed'].map(
+    (s) => `${DELIVERIES_CACHE_KEY}_${s}`
+  )
+  if (isNative) {
+    await Promise.all(keys.map((key) => Preferences.remove({ key })))
+  } else {
+    keys.forEach((key) => localStorage.removeItem(key))
+  }
 }

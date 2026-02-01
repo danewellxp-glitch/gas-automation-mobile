@@ -9,6 +9,7 @@
 import { Geolocation, type Position } from '@capacitor/geolocation'
 import { Capacitor } from '@capacitor/core'
 import { api } from './api'
+import { addToQueue } from './offlineQueue'
 
 let watchId: string | null = null
 let intervalId: ReturnType<typeof setInterval> | null = null
@@ -71,7 +72,7 @@ export async function stopTracking(): Promise<void> {
 }
 
 /**
- * Envia posição atual ao backend
+ * Envia posição atual ao backend (ou enfileira se offline)
  */
 async function sendLocation(): Promise<void> {
   if (!lastPosition) {
@@ -88,6 +89,16 @@ async function sendLocation(): Promise<void> {
     } catch {
       return
     }
+  }
+
+  if (!navigator.onLine) {
+    await addToQueue(
+      'location_update',
+      '/drivers/me/location',
+      'PUT',
+      lastPosition
+    )
+    return
   }
 
   try {

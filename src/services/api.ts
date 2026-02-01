@@ -11,8 +11,19 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 import axiosRetry from 'axios-retry'
-import { getCachedToken, clearCache } from '../utils/storage'
+import {
+  getCachedToken,
+  clearCache,
+  setDeliveriesCache,
+  getDeliveriesCache,
+  clearDeliveriesCache,
+} from '../utils/storage'
 import { getErrorMessage, isAuthError, logError } from '../utils/errorHandler'
+import { addToQueue } from './offlineQueue'
+
+function isOffline(): boolean {
+  return typeof navigator !== 'undefined' && !navigator.onLine
+}
 
 // ============================================================================
 // CONFIGURAÇÃO
@@ -250,10 +261,15 @@ export async function getDriverStats(): Promise<DriverStats> {
 
 /**
  * Atualiza status do motorista (available/offline)
+ * Se offline, enfileira e retorna resposta fake.
  */
 export async function updateDriverStatus(
   status: 'available' | 'offline'
 ): Promise<DriverProfile> {
+  if (isOffline()) {
+    await addToQueue('status_update', '/drivers/me/status', 'PUT', { status })
+    return { id: 0, name: '', phone: '', status, total_deliveries: 0 } as DriverProfile
+  }
   const { data } = await api.put<DriverProfile>('/drivers/me/status', { status })
   return data
 }
@@ -261,13 +277,32 @@ export async function updateDriverStatus(
 /**
  * Lista entregas do motorista
  * @param status Filtro opcional: pending, active, completed
+ * Se offline, retorna do cache quando disponível.
  */
 export async function getDriverDeliveries(
   status?: 'pending' | 'active' | 'completed'
 ): Promise<Delivery[]> {
-  const params = status ? { status } : {}
-  const { data } = await api.get<Delivery[]>('/drivers/me/deliveries', { params })
-  return Array.isArray(data) ? data : []
+  const filter = status || 'active'
+  if (isOffline()) {
+    const cached = await getDeliveriesCache(filter)
+    if (cached && Array.isArray(cached)) {
+      return cached as Delivery[]
+    }
+    return []
+  }
+  try {
+    const params = status ? { status } : {}
+    const { data } = await api.get<Delivery[]>('/drivers/me/deliveries', { params })
+    const list = Array.isArray(data) ? data : []
+    await setDeliveriesCache(filter, list)
+    return list
+  } catch {
+    const cached = await getDeliveriesCache(filter)
+    if (cached && Array.isArray(cached)) {
+      return cached as Delivery[]
+    }
+    throw new Error('Sem conexão e sem cache de entregas.')
+  }
 }
 
 /**
@@ -296,12 +331,22 @@ export async function getDeliveryById(deliveryId: string): Promise<Delivery | nu
 
 /**
  * Atualiza status de uma entrega
+ * Se offline, enfileira e retorna resposta fake.
  */
 export async function updateDeliveryStatus(
   deliveryId: string,
   status: DeliveryStatus,
   notes?: string
 ): Promise<UpdateStatusResponse> {
+  if (isOffline()) {
+    await addToQueue(
+      'delivery_status_update',
+      `/drivers/deliveries/${deliveryId}/status`,
+      'PUT',
+      { status, notes }
+    )
+    return { id: deliveryId, status, message: 'Enfileirado para sincronizar' }
+  }
   const { data } = await api.put<UpdateStatusResponse>(
     `/drivers/deliveries/${deliveryId}/status`,
     { status, notes }
@@ -311,10 +356,20 @@ export async function updateDeliveryStatus(
 
 /**
  * Aceita uma entrega pendente
+ * Se offline, enfileira e retorna resposta fake.
  */
 export async function acceptDelivery(
   deliveryId: string
 ): Promise<{ message: string }> {
+  if (isOffline()) {
+    await addToQueue(
+      'accept_delivery',
+      `/drivers/deliveries/${deliveryId}/accept`,
+      'POST',
+      {}
+    )
+    return { message: 'Enfileirado para sincronizar' }
+  }
   const { data } = await api.post<{ message: string }>(
     `/drivers/deliveries/${deliveryId}/accept`
   )
@@ -353,3 +408,25 @@ export function canUpdateStatus(status: DeliveryStatus | string): boolean {
   const updatableStatuses: DeliveryStatus[] = ['assigned', 'picked_up', 'in_transit', 'arrived']
   return updatableStatuses.includes(status as DeliveryStatus)
 }
+
+/**
+ * Executa request da fila offline (para processQueue)
+ * Retorna dados ou lança erro.
+ */
+export async function executeQueuedRequest(
+  endpoint: string,
+  method: string,
+  payload: unknown
+): Promise<unknown> {
+  if (method === 'PUT') {
+    const { data } = await api.put(endpoint, payload)
+    return data
+  }
+  const { data } = await api.post(endpoint, payload)
+  return data
+}
+
+/**
+ * Invalida cache de entregas (chamar após sincronizar fila)
+ */
+export { clearDeliveriesCache }

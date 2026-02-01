@@ -20,6 +20,7 @@ import {
   setCachedUser,
   type StoredUser,
 } from '../utils/storage'
+import { clearQueue } from '../services/offlineQueue'
 import { initPushNotifications, cleanupPushNotifications } from '../services/pushNotifications'
 
 // ============================================================================
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       await clearCache()
+      await clearQueue()
     } catch {
       // Garantir que state é limpo mesmo se storage falhar
     }
