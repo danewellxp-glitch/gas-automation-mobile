@@ -9,11 +9,11 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
+  IonIcon,
   IonPage,
   IonRefresher,
   IonRefresherContent,
@@ -23,6 +23,7 @@ import {
   RefresherEventDetail,
   useIonToast,
 } from '@ionic/react'
+import { locationOutline } from 'ionicons/icons'
 import { useCallback, useEffect, useState, memo, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import {
@@ -84,7 +85,20 @@ const FilterButtons = memo(function FilterButtons({
 })
 
 /**
- * Item de entrega na lista
+ * Mapa de cores por status (consistente com o design)
+ */
+const STATUS_COLORS: Partial<Record<DeliveryStatus, string>> = {
+  pending: 'var(--status-pending)',
+  assigned: 'var(--status-assigned)',
+  picked_up: 'var(--status-assigned)',
+  in_transit: 'var(--status-in-transit)',
+  arrived: 'var(--status-arrived)',
+  delivered: 'var(--status-delivered)',
+  failed: 'var(--status-failed)',
+}
+
+/**
+ * Card de entrega (design melhorado)
  */
 const DeliveryItem = memo(function DeliveryItem({
   delivery,
@@ -99,59 +113,91 @@ const DeliveryItem = memo(function DeliveryItem({
   onAccept: () => void
   onClick: () => void
 }) {
-  const statusColor = useMemo(() => {
-    const colors: Partial<Record<DeliveryStatus, string>> = {
-      pending: 'var(--ion-color-warning)',
-      assigned: 'var(--ion-color-primary)',
-      in_transit: 'var(--ion-color-tertiary)',
-      delivered: 'var(--ion-color-success)',
-      failed: 'var(--ion-color-danger)',
-    }
-    return colors[delivery.status] || 'var(--ion-color-medium)'
-  }, [delivery.status])
+  const statusColor = useMemo(
+    () => STATUS_COLORS[delivery.status] || 'var(--ion-color-medium)',
+    [delivery.status]
+  )
+
+  const address = delivery.delivery_address_str || delivery.bairro || delivery.address || 'Endereço não informado'
+  const orderLabel = `#${delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}`
 
   return (
-    <IonItem button onClick={onClick} detail>
-      <div
-        slot="start"
-        style={{
-          width: 4,
-          height: 40,
-          borderRadius: 2,
-          background: statusColor,
-        }}
-      />
-      <IonLabel>
-        <h2 style={{ fontWeight: 600, fontSize: 16 }}>
-          Pedido #{delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}
-        </h2>
-        <p style={{ color: 'var(--ion-color-dark)', marginTop: 4 }}>
-          {delivery.delivery_address_str || delivery.bairro || delivery.address || 'Endereco nao informado'}
-        </p>
-        <p style={{ color: statusColor, fontWeight: 500, marginTop: 2 }}>
-          {getStatusLabel(delivery.status)}
-        </p>
-      </IonLabel>
-      {showAccept && (
-        <IonButton
-          slot="end"
-          fill="solid"
-          color="primary"
-          onClick={(e) => {
-            e.stopPropagation()
-            onAccept()
-          }}
-          disabled={accepting}
-          size="small"
-        >
-          {accepting ? (
-            <IonSpinner name="crescent" style={{ width: 16, height: 16 }} />
-          ) : (
-            'Aceitar'
+    <IonCard
+      button
+      onClick={onClick}
+      className={accepting ? 'delivery-card-accepting' : ''}
+      style={{
+        margin: '0 16px 12px',
+        borderRadius: 14,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+        borderLeft: `4px solid ${statusColor}`,
+      }}
+    >
+      <IonCardContent style={{ padding: 18 }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <IonIcon icon={locationOutline} style={{ fontSize: 18, color: 'var(--ion-color-primary)', flexShrink: 0 }} />
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
+                Pedido {orderLabel}
+              </h3>
+            </div>
+            <p style={{ margin: 0, fontSize: 15, color: 'var(--ion-color-dark)', lineHeight: 1.4 }}>
+              {address}
+            </p>
+            {delivery.bairro && address !== delivery.bairro && (
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--ion-color-medium)' }}>
+                {delivery.bairro}
+              </p>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  padding: '4px 10px',
+                  background: statusColor,
+                  color: 'white',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                {getStatusLabel(delivery.status)}
+              </span>
+              {delivery.order_total != null && delivery.order_total > 0 && (
+                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--ion-color-success)' }}>
+                  R$ {delivery.order_total.toFixed(2)}
+                </span>
+              )}
+            </div>
+          </div>
+          {showAccept && (
+            <IonButton
+              fill="solid"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation()
+                onAccept()
+              }}
+              disabled={accepting}
+              style={{
+                '--border-radius': '10px',
+                minWidth: 100,
+                height: 44,
+                fontWeight: 600,
+                flexShrink: 0,
+              } as React.CSSProperties}
+            >
+              {accepting ? (
+                <IonSpinner name="crescent" style={{ width: 20, height: 20 }} />
+              ) : (
+                'Aceitar'
+              )}
+            </IonButton>
           )}
-        </IonButton>
-      )}
-    </IonItem>
+        </div>
+      </IonCardContent>
+    </IonCard>
   )
 })
 
@@ -302,18 +348,18 @@ export default function DeliveryList() {
 
         {/* Success State */}
         {!loading && !error && deliveries.length > 0 && (
-          <IonList lines="full">
-            {deliveries.map((d) => (
-              <DeliveryItem
-                key={d.id}
-                delivery={d}
-                showAccept={filter === 'pending' && d.status === 'pending'}
-                accepting={acceptingId === d.id}
-                onAccept={() => handleAccept(d.id)}
-                onClick={() => handleItemClick(d.id)}
-              />
-            ))}
-          </IonList>
+          <div style={{ padding: '8px 0 24px' }}>
+              {deliveries.map((d) => (
+                <DeliveryItem
+                  key={d.id}
+                  delivery={d}
+                  showAccept={filter === 'pending' && d.status === 'pending'}
+                  accepting={acceptingId === d.id}
+                  onAccept={() => handleAccept(d.id)}
+                  onClick={() => handleItemClick(d.id)}
+                />
+              ))}
+          </div>
         )}
       </IonContent>
     </IonPage>

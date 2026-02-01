@@ -7,16 +7,19 @@
 
 import {
   IonButton,
+  IonCard,
+  IonCardContent,
   IonContent,
+  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonPage,
   IonSpinner,
-  IonText,
   useIonAlert,
 } from '@ionic/react'
+import { mailOutline, lockClosedOutline } from 'ionicons/icons'
 import { useState, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -143,129 +146,83 @@ export default function Login() {
 
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen className="login-content">
         <NetworkStatusBanner />
 
-        <div
-          style={{
-            maxWidth: 400,
-            margin: 'auto',
-            padding: '48px 24px',
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-          }}
-        >
-          {/* Logo / Título */}
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                background: 'var(--ion-color-primary)',
-                borderRadius: 20,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 16px',
-              }}
-            >
-              <span style={{ fontSize: 40, color: 'white' }}>G</span>
-            </div>
-            <IonText color="dark">
-              <h1 style={{ margin: '0 0 8px', fontSize: 28, fontWeight: 700 }}>Gas Driver</h1>
-            </IonText>
-            <p style={{ margin: 0, color: 'var(--ion-color-medium)', fontSize: 15 }}>
-              Entre com suas credenciais
-            </p>
-          </div>
+        {/* Background dark com elementos visuais */}
+        <div className="login-bg">
+          <div className="login-bg-shape login-bg-shape-1" />
+          <div className="login-bg-shape login-bg-shape-2" />
+          <div className="login-bg-shape login-bg-shape-3" />
+        </div>
 
-          {/* Formulário */}
-          <form onSubmit={handleSubmit}>
-            <IonList lines="none" style={{ background: 'transparent' }}>
-              <IonItem
-                style={{
-                  '--background': 'var(--ion-color-light)',
-                  '--border-radius': '8px',
-                  marginBottom: 12,
-                }}
-              >
-                <IonLabel position="stacked" style={{ marginBottom: 4 }}>
-                  E-mail
-                </IonLabel>
-                <IonInput
-                  ref={emailInputRef}
-                  type="email"
-                  value={email}
-                  onIonInput={(e) => handleEmailChange(String(e.detail.value || ''))}
-                  placeholder="seu@email.com"
-                  autocomplete="email"
-                  inputmode="email"
-                  enterkeyhint="next"
-                  disabled={submitting}
-                  style={{ '--padding-start': '0' }}
-                />
-              </IonItem>
+        <div className="login-container">
+          <IonCard className="login-card">
+            <IonCardContent>
+              {/* Logo / Nome do App */}
+              <div className="login-header">
+                <div className="login-logo">
+                  <span>G</span>
+                </div>
+                <h1 className="login-title">Gasmaster</h1>
+                <p className="login-subtitle">Entre com suas credenciais</p>
+              </div>
 
-              {emailError && (
-                <p style={{ color: 'var(--ion-color-danger)', fontSize: 12, margin: '-8px 0 12px 4px' }}>
-                  {emailError}
-                </p>
-              )}
+              {/* Formulário */}
+              <form onSubmit={handleSubmit}>
+                <IonList lines="none" className="login-form-list">
+                  <IonItem className="login-input-item">
+                    <IonIcon icon={mailOutline} slot="start" className="login-input-icon" />
+                    <IonLabel position="stacked">E-mail</IonLabel>
+                    <IonInput
+                      ref={emailInputRef}
+                      type="email"
+                      value={email}
+                      onIonInput={(e) => handleEmailChange(String(e.detail.value || ''))}
+                      placeholder="seu@email.com"
+                      autocomplete="email"
+                      inputmode="email"
+                      enterkeyhint="next"
+                      disabled={submitting}
+                      className="login-input"
+                    />
+                  </IonItem>
 
-              <IonItem
-                style={{
-                  '--background': 'var(--ion-color-light)',
-                  '--border-radius': '8px',
-                  marginBottom: 24,
-                }}
-              >
-                <IonLabel position="stacked" style={{ marginBottom: 4 }}>
-                  Senha
-                </IonLabel>
-                <IonInput
-                  type="password"
-                  value={password}
-                  onIonInput={(e) => setPassword(String(e.detail.value || ''))}
-                  placeholder="Sua senha"
-                  autocomplete="current-password"
-                  enterkeyhint="go"
-                  disabled={submitting}
-                  style={{ '--padding-start': '0' }}
-                />
-              </IonItem>
-            </IonList>
+                  {emailError && <p className="login-error">{emailError}</p>}
 
-            <IonButton
-              type="submit"
-              expand="block"
-              disabled={submitting || isLoading || !email || !password}
-              style={{
-                '--border-radius': '8px',
-                height: 50,
-                fontWeight: 600,
-              }}
-            >
-              {submitting ? (
-                <IonSpinner name="crescent" style={{ width: 20, height: 20 }} />
-              ) : (
-                'Entrar'
-              )}
-            </IonButton>
-          </form>
+                  <IonItem className="login-input-item">
+                    <IonIcon icon={lockClosedOutline} slot="start" className="login-input-icon" />
+                    <IonLabel position="stacked">Senha</IonLabel>
+                    <IonInput
+                      type="password"
+                      value={password}
+                      onIonInput={(e) => setPassword(String(e.detail.value || ''))}
+                      placeholder="Sua senha"
+                      autocomplete="current-password"
+                      enterkeyhint="go"
+                      disabled={submitting}
+                      className="login-input"
+                    />
+                  </IonItem>
+                </IonList>
 
-          {/* Footer */}
-          <p
-            style={{
-              textAlign: 'center',
-              marginTop: 32,
-              fontSize: 12,
-              color: 'var(--ion-color-medium)',
-            }}
-          >
-            Gas Automation - Driver v1.0
-          </p>
+                <IonButton
+                  type="submit"
+                  expand="block"
+                  disabled={submitting || isLoading || !email || !password}
+                  className="login-button"
+                >
+                  {submitting ? (
+                    <IonSpinner name="crescent" style={{ width: 24, height: 24 }} />
+                  ) : (
+                    'Entrar'
+                  )}
+                </IonButton>
+              </form>
+            </IonCardContent>
+          </IonCard>
+
+          <p className="login-footer">Gas Automation - Driver v1.0</p>
         </div>
       </IonContent>
     </IonPage>

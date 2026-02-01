@@ -9,16 +9,21 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonHeader,
+  IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonIcon,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
   IonSpinner,
   IonTitle,
   IonToolbar,
+  RefresherEventDetail,
   useIonToast,
 } from '@ionic/react'
 import { useCallback, useEffect, useState, useMemo } from 'react'
@@ -37,23 +42,146 @@ import { useConfirm, CONFIRM_PRESETS } from '../hooks/useConfirm'
 import { DeliveryDetailSkeleton } from '../components/Skeletons'
 import { ErrorState, OfflineState, EmptyState } from '../components/EmptyState'
 import { NetworkStatusBanner } from '../components/NetworkStatus'
-import { alertCircleOutline, cameraOutline, navigateOutline } from 'ionicons/icons'
+import {
+  alertCircleOutline,
+  cameraOutline,
+  callOutline,
+  checkmarkCircleOutline,
+  locateOutline,
+  navigateOutline,
+} from 'ionicons/icons'
 import { takeDeliveryPhoto, uploadDeliveryProof } from '../services/camera'
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-/**
- * Opções de status disponíveis
- */
-const STATUS_OPTIONS: { value: DeliveryStatus; label: string; color: string }[] = [
-  { value: 'picked_up', label: 'Retirada', color: 'primary' },
-  { value: 'in_transit', label: 'Em rota', color: 'tertiary' },
-  { value: 'arrived', label: 'Chegou', color: 'secondary' },
-  { value: 'delivered', label: 'Entregue', color: 'success' },
-  { value: 'failed', label: 'Falha', color: 'danger' },
+/** Etapas da entrega para timeline */
+const DELIVERY_STAGES: { status: DeliveryStatus; label: string }[] = [
+  { status: 'assigned', label: 'Atribuída' },
+  { status: 'picked_up', label: 'Retirada' },
+  { status: 'in_transit', label: 'Em rota' },
+  { status: 'arrived', label: 'Chegou' },
+  { status: 'delivered', label: 'Entregue' },
 ]
+
+/**
+ * Opções de status disponíveis (cores por status)
+ */
+const STATUS_OPTIONS: { value: DeliveryStatus; label: string; colorVar: string }[] = [
+  { value: 'picked_up', label: 'Retirada', colorVar: 'var(--status-assigned)' },
+  { value: 'in_transit', label: 'Em rota', colorVar: 'var(--status-in-transit)' },
+  { value: 'arrived', label: 'Chegou', colorVar: 'var(--status-arrived)' },
+  { value: 'delivered', label: 'Entregue', colorVar: 'var(--status-delivered)' },
+  { value: 'failed', label: 'Falha', colorVar: 'var(--status-failed)' },
+]
+
+/**
+ * Timeline visual do status (bolinha → linha → bolinha)
+ */
+function StatusTimeline({ delivery }: { delivery: Delivery }) {
+  const statusOrder: DeliveryStatus[] = ['assigned', 'picked_up', 'in_transit', 'arrived', 'delivered']
+  const currentIdx = statusOrder.indexOf(delivery.status)
+  const isFailed = delivery.status === 'failed'
+
+  return (
+    <IonCard style={{ margin: '0 0 20px', borderRadius: 14 }}>
+      <IonCardContent style={{ padding: 20 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600, color: 'var(--ion-color-medium)' }}>
+          Andamento
+        </p>
+        {DELIVERY_STAGES.map((stage, i) => {
+          const stepIdx = statusOrder.indexOf(stage.status)
+          const isCompleted = isFailed
+            ? stage.status !== 'delivered' && stepIdx < currentIdx
+            : stepIdx <= currentIdx
+          const isCurrent = delivery.status === stage.status && !isFailed
+          const isLast = i === DELIVERY_STAGES.length - 1
+
+          return (
+            <div key={stage.status} style={{ display: 'flex', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 20 }}>
+                <div
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: isCompleted || isCurrent ? 'var(--ion-color-primary)' : 'var(--ion-color-light)',
+                    border: `2px solid ${isCompleted || isCurrent ? 'var(--ion-color-primary)' : 'var(--ion-color-light-shade)'}`,
+                    flexShrink: 0,
+                  }}
+                />
+                {!isLast && (
+                  <div
+                    style={{
+                      width: 2,
+                      flex: 1,
+                      minHeight: 28,
+                      background: isCompleted ? 'var(--ion-color-primary)' : 'var(--ion-color-light-shade)',
+                      marginTop: 4,
+                    }}
+                  />
+                )}
+              </div>
+              <div style={{ marginLeft: 14, paddingBottom: isLast ? 0 : 8 }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 15,
+                    fontWeight: isCurrent ? 700 : 500,
+                    color: isCompleted || isCurrent ? 'var(--ion-color-dark)' : 'var(--ion-color-medium)',
+                  }}
+                >
+                  {stage.label}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </IonCardContent>
+    </IonCard>
+  )
+}
+
+/**
+ * Mapa estático ou placeholder com botão de navegação
+ */
+function MapSection({ address }: { address: string }) {
+  if (!address) return null
+
+  return (
+    <IonCard style={{ margin: '0 0 20px', borderRadius: 14 }}>
+      <IonCardContent style={{ padding: 0 }}>
+        <div
+          className="map-placeholder"
+          style={{
+            height: 140,
+            background: 'linear-gradient(135deg, var(--ion-color-light) 0%, var(--ion-color-light-shade) 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+          }}
+        >
+          <IonIcon icon={locateOutline} style={{ fontSize: 40, color: 'var(--ion-color-primary)' }} />
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--ion-color-medium)', textAlign: 'center', padding: '0 16px' }}>
+            {address}
+          </p>
+          <IonButton
+            fill="solid"
+            color="primary"
+            onClick={() => openNavigation(address)}
+            style={{ '--border-radius': '10px', fontWeight: 600 } as React.CSSProperties}
+          >
+            <IonIcon icon={navigateOutline} slot="start" />
+            Abrir no mapa
+          </IonButton>
+        </div>
+      </IonCardContent>
+    </IonCard>
+  )
+}
 
 // ============================================================================
 // PAGE
@@ -94,6 +222,11 @@ export default function DeliveryDetail() {
   useEffect(() => {
     load()
   }, [load])
+
+  const onRefresh = async (e: CustomEvent<RefresherEventDetail>) => {
+    await load()
+    e.detail.complete()
+  }
 
   /**
    * Atualiza status com confirmação
@@ -188,21 +321,21 @@ export default function DeliveryDetail() {
   }, [delivery])
 
   /**
-   * Cor do status atual
+   * Cor do status atual (variável CSS)
    */
-  const statusColor = useMemo(() => {
-    if (!delivery) return 'medium'
-    const colors: Partial<Record<DeliveryStatus, string>> = {
-      pending: 'warning',
-      assigned: 'primary',
-      picked_up: 'primary',
-      in_transit: 'tertiary',
-      arrived: 'secondary',
-      delivered: 'success',
-      failed: 'danger',
-      returned: 'medium',
+  const statusColorVar = useMemo(() => {
+    if (!delivery) return 'var(--ion-color-medium)'
+    const vars: Partial<Record<DeliveryStatus, string>> = {
+      pending: 'var(--status-pending)',
+      assigned: 'var(--status-assigned)',
+      picked_up: 'var(--status-assigned)',
+      in_transit: 'var(--status-in-transit)',
+      arrived: 'var(--status-arrived)',
+      delivered: 'var(--status-delivered)',
+      failed: 'var(--status-failed)',
+      returned: 'var(--ion-color-medium)',
     }
-    return colors[delivery.status] || 'medium'
+    return vars[delivery.status] || 'var(--ion-color-medium)'
   }, [delivery])
 
   // ============================================================================
@@ -222,6 +355,10 @@ export default function DeliveryDetail() {
 
       <IonContent fullscreen>
         <NetworkStatusBanner onRetry={load} />
+
+        <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
+          <IonRefresherContent />
+        </IonRefresher>
 
         {/* Loading State */}
         {loading && <DeliveryDetailSkeleton />}
@@ -251,179 +388,217 @@ export default function DeliveryDetail() {
             <div
               style={{
                 display: 'inline-block',
-                background: `var(--ion-color-${statusColor})`,
-                color: `var(--ion-color-${statusColor}-contrast)`,
-                padding: '6px 12px',
-                borderRadius: 16,
+                background: statusColorVar,
+                color: 'white',
+                padding: '8px 14px',
+                borderRadius: 12,
                 fontSize: 14,
                 fontWeight: 600,
-                marginBottom: 16,
+                marginBottom: 20,
               }}
             >
               {getStatusLabel(delivery.status)}
             </div>
 
-            {/* Detalhes */}
-            <IonList lines="full" style={{ marginBottom: 24 }}>
-              <IonItem>
-                <IonLabel>
-                  <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Pedido</p>
-                  <h2 style={{ fontWeight: 600, fontSize: 18, marginTop: 4 }}>
-                    #{delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}
-                  </h2>
-                </IonLabel>
-              </IonItem>
+            {/* Botão Ligar - Destaque */}
+            {delivery.customer_phone && (
+              <IonButton
+                expand="block"
+                fill="solid"
+                color="primary"
+                href={`tel:${delivery.customer_phone}`}
+                style={{
+                  marginBottom: 20,
+                  '--border-radius': '12px',
+                  height: 52,
+                  fontWeight: 600,
+                  fontSize: 17,
+                } as React.CSSProperties}
+              >
+                <IonIcon icon={callOutline} slot="start" style={{ fontSize: 22 }} />
+                Ligar para cliente
+              </IonButton>
+            )}
 
-              <IonItem>
-                <IonLabel>
-                  <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Endereco / Bairro</p>
-                  <h2 style={{ fontSize: 16, marginTop: 4 }}>
-                    {delivery.delivery_address_str || delivery.address || delivery.bairro || 'Nao informado'}
-                  </h2>
-                </IonLabel>
-                {(delivery.delivery_address_str || delivery.address || delivery.bairro) && (
-                  <IonButton
-                    slot="end"
-                    fill="solid"
-                    color="primary"
-                    size="small"
-                    onClick={() => openNavigation(delivery.delivery_address_str || delivery.address || delivery.bairro || '')}
-                  >
-                    <IonIcon icon={navigateOutline} slot="start" />
-                    Navegar
-                  </IonButton>
-                )}
-              </IonItem>
+            {/* Timeline de Status */}
+            <StatusTimeline delivery={delivery} />
 
-              {delivery.customer_name && (
-                <IonItem>
-                  <IonLabel>
-                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Cliente</p>
-                    <h2 style={{ fontSize: 16, marginTop: 4 }}>{delivery.customer_name}</h2>
-                  </IonLabel>
-                </IonItem>
-              )}
+            {/* Mapa com endereço */}
+            <MapSection
+              address={delivery.delivery_address_str || delivery.address || delivery.bairro || ''}
+            />
 
-              {delivery.customer_phone && (
-                <IonItem>
-                  <IonLabel>
-                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Telefone</p>
-                    <h2 style={{ fontSize: 16, marginTop: 4 }}>
-                      <a href={`tel:${delivery.customer_phone}`} style={{ color: 'var(--ion-color-primary)' }}>
-                        {delivery.customer_phone}
-                      </a>
-                    </h2>
-                  </IonLabel>
-                </IonItem>
-              )}
-
-              {delivery.order_items && delivery.order_items.length > 0 && (
-                <IonItem>
-                  <IonLabel className="ion-text-wrap">
-                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Itens</p>
-                    {delivery.order_items.map((item, i) => (
-                      <h2 key={i} style={{ fontSize: 14, marginTop: 4 }}>
-                        {item.quantity}x {item.product_name}
+            {/* Detalhes em card */}
+            <IonCard style={{ margin: '0 0 20px', borderRadius: 14 }}>
+              <IonCardContent style={{ padding: 20 }}>
+                <IonList lines="none" style={{ background: 'transparent' }}>
+                  <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                    <IonLabel>
+                      <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Pedido</p>
+                      <h2 style={{ fontWeight: 700, fontSize: 18, marginTop: 4 }}>
+                        #{delivery.order_number || String(delivery.order_id || delivery.id).slice(0, 8)}
                       </h2>
-                    ))}
-                  </IonLabel>
-                </IonItem>
-              )}
+                    </IonLabel>
+                  </IonItem>
 
-              {delivery.order_total != null && delivery.order_total > 0 && (
-                <IonItem>
-                  <IonLabel>
-                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Valor</p>
-                    <h2 style={{ fontWeight: 600, fontSize: 18, marginTop: 4, color: 'var(--ion-color-success)' }}>
-                      R$ {delivery.order_total.toFixed(2)}
-                    </h2>
-                  </IonLabel>
-                </IonItem>
-              )}
-
-              {delivery.notes && (
-                <IonItem>
-                  <IonLabel className="ion-text-wrap">
-                    <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Observacoes</p>
-                    <h2 style={{ fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
-                      {delivery.notes}
-                    </h2>
-                  </IonLabel>
-                </IonItem>
-              )}
-            </IonList>
-
-            {/* Botões de Status */}
-            {showStatusButtons && (
-              <div>
-                <p
-                  style={{
-                    marginBottom: 12,
-                    fontWeight: 600,
-                    fontSize: 16,
-                    color: 'var(--ion-color-dark)',
-                  }}
-                >
-                  Atualizar status
-                </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {STATUS_OPTIONS.map((opt) => {
-                    const isCurrentStatus = delivery.status === opt.value
-                    const isUpdating = updating === opt.value
-
-                    return (
+                  <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                    <IonLabel>
+                      <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Endereço</p>
+                      <h2 style={{ fontSize: 16, marginTop: 4, lineHeight: 1.4 }}>
+                        {delivery.delivery_address_str || delivery.address || delivery.bairro || 'Não informado'}
+                      </h2>
+                      {delivery.bairro && (delivery.delivery_address_str || delivery.address) && (
+                        <p style={{ margin: '2px 0 0', fontSize: 14, color: 'var(--ion-color-medium)' }}>{delivery.bairro}</p>
+                      )}
+                    </IonLabel>
+                    {(delivery.delivery_address_str || delivery.address || delivery.bairro) && (
                       <IonButton
-                        key={opt.value}
-                        fill={isCurrentStatus ? 'solid' : 'outline'}
-                        color={opt.color}
-                        size="small"
-                        disabled={isCurrentStatus || updating !== null}
-                        onClick={() => handleStatusChange(opt.value)}
-                        style={{ minWidth: 90 }}
+                        slot="end"
+                        fill="outline"
+                        color="primary"
+                        size="default"
+                        onClick={() => openNavigation(delivery.delivery_address_str || delivery.address || delivery.bairro || '')}
+                        style={{ '--border-radius': '10px' } as React.CSSProperties}
                       >
-                        {isUpdating ? (
-                          <IonSpinner name="crescent" style={{ width: 16, height: 16 }} />
-                        ) : (
-                          <>
-                            {opt.value === 'delivered' && (
-                              <IonIcon icon={cameraOutline} style={{ marginRight: 4 }} />
-                            )}
-                            {opt.label}
-                          </>
-                        )}
+                        <IonIcon icon={navigateOutline} slot="start" />
+                        Navegar
                       </IonButton>
-                    )
-                  })}
-                </div>
-              </div>
+                    )}
+                  </IonItem>
+
+                  {delivery.customer_name && (
+                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                      <IonLabel>
+                        <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Cliente</p>
+                        <h2 style={{ fontSize: 16, marginTop: 4 }}>{delivery.customer_name}</h2>
+                      </IonLabel>
+                    </IonItem>
+                  )}
+
+                  {delivery.order_items && delivery.order_items.length > 0 && (
+                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                      <IonLabel>
+                        <p style={{ color: 'var(--ion-color-medium)', fontSize: 12, marginBottom: 8 }}>Itens do pedido</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {delivery.order_items.map((item, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '8px 12px',
+                                background: 'var(--ion-color-light)',
+                                borderRadius: 10,
+                                fontSize: 15,
+                                fontWeight: 500,
+                              }}
+                            >
+                              <span style={{ color: 'var(--ion-color-primary)', fontWeight: 700 }}>{item.quantity}x</span>
+                              <span>{item.product_name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </IonLabel>
+                    </IonItem>
+                  )}
+
+                  {delivery.order_total != null && delivery.order_total > 0 && (
+                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                      <IonLabel>
+                        <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Valor total</p>
+                        <h2 style={{ fontWeight: 700, fontSize: 20, marginTop: 4, color: 'var(--ion-color-success)' }}>
+                          R$ {delivery.order_total.toFixed(2)}
+                        </h2>
+                      </IonLabel>
+                    </IonItem>
+                  )}
+
+                  {delivery.notes && (
+                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0 } as React.CSSProperties}>
+                      <IonLabel className="ion-text-wrap">
+                        <p style={{ color: 'var(--ion-color-medium)', fontSize: 12 }}>Observações</p>
+                        <p style={{ fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
+                          {delivery.notes}
+                        </p>
+                      </IonLabel>
+                    </IonItem>
+                  )}
+                </IonList>
+              </IonCardContent>
+            </IonCard>
+
+            {/* Botões de Status - Maiores */}
+            {showStatusButtons && (
+              <IonCard style={{ margin: '0 0 20px', borderRadius: 14 }}>
+                <IonCardContent style={{ padding: 20 }}>
+                  <p style={{ margin: '0 0 16px', fontWeight: 600, fontSize: 16 }}>
+                    Atualizar status
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                    {STATUS_OPTIONS.map((opt) => {
+                      const isCurrentStatus = delivery.status === opt.value
+                      const isUpdating = updating === opt.value
+
+                      return (
+                        <IonButton
+                          key={opt.value}
+                          fill={isCurrentStatus ? 'solid' : 'outline'}
+                          style={{
+                            minWidth: 100,
+                            height: 48,
+                            '--border-radius': '10px',
+                            fontWeight: 600,
+                            '--background': opt.colorVar,
+                            '--color': 'white',
+                            '--border-color': opt.colorVar,
+                            '--color-hover': 'white',
+                            '--color-activated': 'white',
+                          } as React.CSSProperties}
+                          disabled={isCurrentStatus || updating !== null}
+                          onClick={() => handleStatusChange(opt.value)}
+                        >
+                          {isUpdating ? (
+                            <IonSpinner name="crescent" style={{ width: 20, height: 20 }} />
+                          ) : (
+                            <>
+                              {opt.value === 'delivered' && (
+                                <IonIcon icon={cameraOutline} slot="start" style={{ marginRight: 6 }} />
+                              )}
+                              {opt.label}
+                            </>
+                          )}
+                        </IonButton>
+                      )
+                    })}
+                  </div>
+                </IonCardContent>
+              </IonCard>
             )}
 
             {/* Mensagem para entregas finalizadas */}
             {!showStatusButtons && delivery.status === 'delivered' && (
-              <div
-                style={{
-                  background: 'var(--ion-color-success-shade)',
-                  padding: 16,
-                  borderRadius: 8,
-                  textAlign: 'center',
-                }}
-              >
-                <p style={{ margin: 0, color: 'var(--ion-color-success-contrast)' }}>
-                  Entrega concluida com sucesso!
-                </p>
-              </div>
+              <IonCard style={{ margin: 0, borderRadius: 14, background: 'var(--gradient-primary)' }}>
+                <IonCardContent style={{ padding: 24, textAlign: 'center', color: 'white' }}>
+                  <IonIcon icon={checkmarkCircleOutline} style={{ fontSize: 48, marginBottom: 12 }} />
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>Entrega concluída!</p>
+                  <p style={{ margin: '8px 0 0', fontSize: 14, opacity: 0.95 }}>
+                    Foto de comprovante registrada com sucesso.
+                  </p>
+                </IonCardContent>
+              </IonCard>
             )}
 
             {!showStatusButtons && delivery.status === 'failed' && (
               <div
                 style={{
                   background: 'var(--ion-color-danger-shade)',
-                  padding: 16,
-                  borderRadius: 8,
+                  padding: 20,
+                  borderRadius: 14,
                   textAlign: 'center',
                 }}
               >
-                <p style={{ margin: 0, color: 'var(--ion-color-danger-contrast)' }}>
+                <p style={{ margin: 0, color: 'var(--ion-color-danger-contrast)', fontWeight: 600 }}>
                   Esta entrega foi marcada como falha.
                 </p>
               </div>

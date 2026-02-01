@@ -6,7 +6,7 @@
  * Melhor UX que spinner genérico.
  */
 
-import { IonItem, IonLabel, IonList, IonSkeletonText } from '@ionic/react'
+import { IonSkeletonText } from '@ionic/react'
 
 /**
  * Skeleton para cards de estatísticas do Dashboard
@@ -55,52 +55,72 @@ export function DashboardSkeleton() {
 }
 
 /**
- * Skeleton para lista de entregas
+ * Skeleton para lista de entregas (cards)
  */
 export function DeliveryListSkeleton({ count = 5 }: { count?: number }) {
   return (
-    <IonList lines="full">
+    <div style={{ padding: '8px 16px 24px' }}>
       {Array.from({ length: count }).map((_, i) => (
-        <IonItem key={i}>
-          <IonLabel>
-            <IonSkeletonText animated style={{ width: '40%', height: 18, marginBottom: 8 }} />
-            <IonSkeletonText animated style={{ width: '70%', height: 14, marginBottom: 4 }} />
-            <IonSkeletonText animated style={{ width: '30%', height: 14 }} />
-          </IonLabel>
-        </IonItem>
+        <div
+          key={i}
+          style={{
+            background: 'var(--ion-color-light)',
+            padding: 18,
+            borderRadius: 14,
+            marginBottom: 12,
+          }}
+        >
+          <IonSkeletonText animated style={{ width: '45%', height: 18, marginBottom: 10 }} />
+          <IonSkeletonText animated style={{ width: '80%', height: 14, marginBottom: 8 }} />
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <IonSkeletonText animated style={{ width: 80, height: 24, borderRadius: 8 }} />
+            <IonSkeletonText animated style={{ width: 60, height: 24, borderRadius: 8 }} />
+          </div>
+        </div>
       ))}
-    </IonList>
+    </div>
   )
 }
 
 /**
- * Skeleton para detalhes de entrega
+ * Skeleton para detalhes de entrega (timeline, mapa, cards)
  */
 export function DeliveryDetailSkeleton() {
   return (
     <div className="ion-padding">
-      <IonList lines="full">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <IonItem key={i}>
-            <IonLabel>
-              <IonSkeletonText animated style={{ width: '30%', height: 16, marginBottom: 8 }} />
-              <IonSkeletonText animated style={{ width: '60%', height: 14 }} />
-            </IonLabel>
-          </IonItem>
-        ))}
-      </IonList>
+      <IonSkeletonText animated style={{ width: 100, height: 32, borderRadius: 12, marginBottom: 20 }} />
+      <IonSkeletonText animated style={{ width: '100%', height: 52, borderRadius: 12, marginBottom: 20 }} />
 
-      <div style={{ marginTop: 24 }}>
-        <IonSkeletonText animated style={{ width: '40%', height: 18, marginBottom: 12 }} />
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <IonSkeletonText
-              key={i}
-              animated
-              style={{ width: 80, height: 32, borderRadius: 4 }}
-            />
-          ))}
-        </div>
+      {/* Timeline */}
+      <div style={{ background: 'var(--ion-color-light)', padding: 20, borderRadius: 14, marginBottom: 20 }}>
+        <IonSkeletonText animated style={{ width: '40%', height: 14, marginBottom: 16 }} />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} style={{ display: 'flex', gap: 14, marginBottom: i < 4 ? 20 : 0 }}>
+            <IonSkeletonText animated style={{ width: 14, height: 14, borderRadius: '50%', flexShrink: 0 }} />
+            <IonSkeletonText animated style={{ width: '60%', height: 16 }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Mapa placeholder */}
+      <div style={{ background: 'var(--ion-color-light)', height: 140, borderRadius: 14, marginBottom: 20 }} />
+
+      {/* Detalhes card */}
+      <div style={{ background: 'var(--ion-color-light)', padding: 20, borderRadius: 14, marginBottom: 20 }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ marginBottom: i < 3 ? 16 : 0 }}>
+            <IonSkeletonText animated style={{ width: '30%', height: 12, marginBottom: 8 }} />
+            <IonSkeletonText animated style={{ width: i === 1 ? '90%' : '60%', height: 16 }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Botões de status */}
+      <IonSkeletonText animated style={{ width: '45%', height: 16, marginBottom: 12 }} />
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <IonSkeletonText key={i} animated style={{ width: 100, height: 48, borderRadius: 10 }} />
+        ))}
       </div>
     </div>
   )
