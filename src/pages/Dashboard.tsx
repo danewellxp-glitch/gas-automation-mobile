@@ -334,11 +334,18 @@ export default function Dashboard() {
    * Logout com confirmação
    */
   const handleLogout = async () => {
-    const { confirmed } = await confirm(CONFIRM_PRESETS.logout)
-    if (!confirmed) return
+    try {
+      const { confirmed } = await confirm(CONFIRM_PRESETS.logout)
+      if (!confirmed) return
 
-    await logout()
-    history.replace('/login')
+      await logout()
+      // Defer navigation para garantir que React processou o state antes do Login montar
+      setTimeout(() => history.replace('/login'), 0)
+    } catch (e) {
+      // Se confirm falhar, tentar logout direto
+      await logout()
+      history.replace('/login')
+    }
   }
 
   // ============================================================================

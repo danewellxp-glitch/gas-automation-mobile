@@ -29,21 +29,30 @@ export function useConfirm() {
   const confirm = useCallback(
     (options: ConfirmOptions): Promise<ConfirmResult> => {
       return new Promise((resolve) => {
+        let resolved = false
+        const safeResolve = (result: ConfirmResult) => {
+          if (!resolved) {
+            resolved = true
+            resolve(result)
+          }
+        }
         presentAlert({
           header: options.header || 'Confirmar',
           message: options.message,
+          backdropDismiss: false,
           buttons: [
             {
               text: options.cancelText || 'Cancelar',
               role: 'cancel',
-              handler: () => resolve({ confirmed: false }),
+              handler: () => safeResolve({ confirmed: false }),
             },
             {
               text: options.confirmText || 'Confirmar',
               role: options.destructive ? 'destructive' : undefined,
-              handler: () => resolve({ confirmed: true }),
+              handler: () => safeResolve({ confirmed: true }),
             },
           ],
+          onDidDismiss: () => safeResolve({ confirmed: false }),
         })
       })
     },

@@ -65,8 +65,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Logout - limpa cache, storage e push notifications
    */
   const logout = useCallback(async () => {
-    await cleanupPushNotifications()
-    await clearCache()
+    try {
+      await cleanupPushNotifications()
+    } catch {
+      // Não bloquear logout se push der erro
+    }
+    try {
+      await clearCache()
+    } catch {
+      // Garantir que state é limpo mesmo se storage falhar
+    }
     setState({ isAuthenticated: false, user: null, isLoading: false })
   }, [])
 
