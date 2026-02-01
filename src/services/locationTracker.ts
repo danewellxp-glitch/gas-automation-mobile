@@ -14,7 +14,7 @@ let watchId: string | null = null
 let intervalId: ReturnType<typeof setInterval> | null = null
 let lastPosition: { latitude: number; longitude: number } | null = null
 
-const SEND_INTERVAL_MS = 30_000 // 30 segundos
+const SEND_INTERVAL_MS = 15_000 // 15 segundos (mais frequente para auto-arrived ~1 min)
 
 /**
  * Inicia rastreamento GPS

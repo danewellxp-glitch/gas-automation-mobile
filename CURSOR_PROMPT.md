@@ -71,7 +71,7 @@ O app está funcional mas com visual muito básico. Precisa de uma reformulaçã
 ### O que melhorar:
 
 #### Login
-- Card centralizado com logo/nome do app
+- Card centralizado com logo/nome do app Gasmaster
 - Inputs com ícones (email, lock)
 - Botão de login com gradiente verde
 - Background dark com algum elemento visual
@@ -167,6 +167,12 @@ interface QueuedAction {
 4. Verificar se ações foram sincronizadas
 
 ---
+
+## GPS Auto-Arrived + WhatsApp "1 minuto"
+Quando o motorista está em rota e se aproxima do cliente (~500m), o backend:
+- Auto-atualiza status para `arrived`
+- Envia WhatsApp: "Seu gás está a 1 minuto da sua casa!"
+Ver: `docs/guias/GPS_AUTO_ARRIVED_WHATSAPP.md`
 
 ## Notas Importantes
 - O app usa React Router v5 (não v6)
