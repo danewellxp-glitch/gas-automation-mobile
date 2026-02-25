@@ -277,19 +277,13 @@ export async function updateDriverStatus(
 /**
  * Lista entregas do motorista
  * @param status Filtro opcional: pending, active, completed
- * Se offline, retorna do cache quando disponível.
+ * Sempre tenta API primeiro - navigator.onLine no Android WebView é pouco confiável.
+ * Usa cache apenas quando a requisição falha (rede/conexão).
  */
 export async function getDriverDeliveries(
   status?: 'pending' | 'active' | 'completed'
 ): Promise<Delivery[]> {
   const filter = status || 'active'
-  if (isOffline()) {
-    const cached = await getDeliveriesCache(filter)
-    if (cached && Array.isArray(cached)) {
-      return cached as Delivery[]
-    }
-    return []
-  }
   try {
     const params = status ? { status } : {}
     const { data } = await api.get<Delivery[]>('/drivers/me/deliveries', { params })
@@ -301,7 +295,9 @@ export async function getDriverDeliveries(
     if (cached && Array.isArray(cached)) {
       return cached as Delivery[]
     }
-    throw new Error('Sem conexão e sem cache de entregas.')
+    throw new Error(
+      'Sem conexão e sem cache de entregas. Verifique: celular e PC na mesma rede Wi-Fi, backend rodando, IP correto no .env'
+    )
   }
 }
 
