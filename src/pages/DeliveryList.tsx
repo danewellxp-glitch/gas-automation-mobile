@@ -241,6 +241,15 @@ export default function DeliveryList() {
     load()
   }, [load])
 
+  // Polling automático de 30s quando na aba "Pendentes"
+  useEffect(() => {
+    if (filter !== 'pending') return
+    const interval = setInterval(() => {
+      load()
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [filter, load])
+
   /**
    * Pull-to-refresh
    */
