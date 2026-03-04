@@ -199,6 +199,9 @@ export default function Login() {
                       onIonInput={(e) => setPassword(String(e.detail.value || ''))}
                       placeholder="Sua senha"
                       autocomplete="current-password"
+                      autocapitalize="off"
+                      autocorrect="off"
+                      spellcheck={false}
                       enterkeyhint="go"
                       disabled={submitting}
                       className="login-input"
