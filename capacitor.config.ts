@@ -74,7 +74,7 @@ const config: CapacitorConfig = {
      */
     allowNavigation: isProduction
       ? ['api.gasautomation.com']
-      : ['10.0.2.2', '192.168.10.156', 'localhost'],
+      : ['10.0.2.2', '192.168.10.167', 'localhost'],
   },
 }
 

@@ -116,7 +116,7 @@ O app será instalado e aberto no dispositivo/emulador.
   Verifique se existe `dist/index.html` e se você rodou `npx cap sync android`. Se mudou o frontend, rode `./sync-from-frontend.sh` e depois `npx cap sync android`.
 
 - **App não conecta ao servidor**  
-  Celular e o PC onde está o backend (192.168.10.156) precisam estar na **mesma rede Wi‑Fi** (ou VPN). No celular, não use “dados móveis” para acessar 192.168.10.156.
+  Celular e o PC onde está o backend (192.168.10.167) precisam estar na **mesma rede Wi‑Fi** (ou VPN). No celular, não use “dados móveis” para acessar 192.168.10.167.
 
 - **Gradle sync falhou**  
   Confirme que abriu a pasta **`android`**, não a raiz. E que tem **JDK** instalado (Android Studio costuma trazer um embutido).

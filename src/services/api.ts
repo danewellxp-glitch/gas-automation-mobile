@@ -36,9 +36,9 @@ function isOffline(): boolean {
 /**
  * URL da API
  * Emulador Android: 10.0.2.2 → Windows host → port forward → Linux backend
- * Device fisico: usar IP direto da rede (192.168.10.156)
+ * Device fisico: usar IP direto da rede (192.168.10.167)
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.10.156:8000/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.10.167:8000/api'
 
 /**
  * Timeout padrão (15 segundos - adequado para 3G/4G)

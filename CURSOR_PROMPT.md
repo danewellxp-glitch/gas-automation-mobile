@@ -30,7 +30,7 @@ src/
 - @capacitor/push-notifications (FCM)
 
 ### API Base URL
-`http://192.168.10.156:8000/api`
+`http://192.168.10.167:8000/api`
 
 ### Endpoints Usados
 - POST /auth/login
@@ -178,6 +178,6 @@ Ver: `docs/guias/GPS_AUTO_ARRIVED_WHATSAPP.md`
 - O app usa React Router v5 (não v6)
 - Tema está em `src/theme/variables.css`
 - Build: `npm run build && npx cap sync android`
-- API URL: `http://192.168.10.156:8000/api`
-- Backend roda em Docker no Linux (192.168.10.156)
+- API URL: `http://192.168.10.167:8000/api`
+- Backend roda em Docker no Linux (192.168.10.167)
 - NUNCA usar `capacitor://localhost` em CORS (crasha o backend)

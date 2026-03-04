@@ -5,7 +5,7 @@
 | Pergunta | Resposta |
 |----------|----------|
 | O app mobile está coerente com o app de driver da pasta gas-automation? | **SIM** |
-| O app vai conectar ao servidor 192.168.10.156? | **SIM** |
+| O app vai conectar ao servidor 192.168.10.167? | **SIM** |
 | Todas as funções funcionam igual ao React do outro projeto? | **SIM** (é o mesmo código) |
 
 ---
@@ -17,15 +17,15 @@
    O fluxo é: build em `gas-automation/frontend` → saída em `dist-build/` → cópia para `gas-automation-mobile/dist/` (via `./sync-from-frontend.sh`).  
    Ou seja: **não há outra versão do app**; o mobile usa o mesmo React do projeto gas-automation.
 
-2. **Conexão com 192.168.10.156**  
+2. **Conexão com 192.168.10.167**  
    - No frontend, a API e o WebSocket usam:
      - `gas-automation/frontend/.env.production`:  
-       `VITE_API_URL=http://192.168.10.156:8000/api`,  
-       `VITE_WS_URL=ws://192.168.10.156:8000`
+       `VITE_API_URL=http://192.168.10.167:8000/api`,  
+       `VITE_WS_URL=ws://192.168.10.167:8000`
      - `gas-automation/frontend/vite.config.js`:  
-       `__API_URL__` e `__WS_URL__` apontando para `http://192.168.10.156:8000/api` e `ws://192.168.10.156:8000/ws`
+       `__API_URL__` e `__WS_URL__` apontando para `http://192.168.10.167:8000/api` e `ws://192.168.10.167:8000/ws`
    - O build de produção (`npm run build` no frontend) usa essas variáveis; elas ficam “gravadas” no JS que vai para o APK.
-   - Em `gas-automation-mobile/capacitor.config.json`, `server.allowNavigation` inclui `192.168.10.156` e `http://192.168.10.156:8000`, então o WebView do Android permite requisições para esse servidor.
+   - Em `gas-automation-mobile/capacitor.config.json`, `server.allowNavigation` inclui `192.168.10.167` e `http://192.168.10.167:8000`, então o WebView do Android permite requisições para esse servidor.
 
 3. **Funções do driver (todas iguais ao React do outro projeto)**  
    As mesmas telas e fluxos do driver no frontend estão no app:
@@ -60,12 +60,12 @@
    Depois rodar de novo `./sync-from-frontend.sh` e rebuild do APK.
 
 3. **Celular na mesma rede**  
-   O dispositivo precisa estar na mesma rede (ou VPN) que o `192.168.10.156` para a API e o WebSocket funcionarem.
+   O dispositivo precisa estar na mesma rede (ou VPN) que o `192.168.10.167` para a API e o WebSocket funcionarem.
 
 ---
 
 ## Resumo
 
 - **Coerente com o app de driver da pasta gas-automation?** Sim.  
-- **Vai conectar ao 192.168.10.156?** Sim, desde que o build seja feito com o frontend que usa `.env.production` / `vite.config.js` com esse IP.  
+- **Vai conectar ao 192.168.10.167?** Sim, desde que o build seja feito com o frontend que usa `.env.production` / `vite.config.js` with esse IP.
 - **Todas as funções iguais ao React do outro projeto?** Sim; o app mobile é o mesmo código React do frontend, só empacotado no Capacitor.

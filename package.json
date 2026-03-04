@@ -19,10 +19,10 @@
     "postinstall": "node -e \"const fs=require('fs');const f='node_modules/@capacitor/preferences/android/build.gradle';if(fs.existsSync(f)){let c=fs.readFileSync(f,'utf8');c=c.replace(\\\"proguard-android.txt\\\",\\\"proguard-android-optimize.txt\\\");fs.writeFileSync(f,c)}\""
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.2",
-    "@capacitor/camera": "^8.0.0",
-    "@capacitor/core": "^8.0.2",
-    "@capacitor/geolocation": "^8.0.0",
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/camera": "^8.0.1",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/geolocation": "^8.1.0",
     "@capacitor/preferences": "^8.0.0",
     "@capacitor/push-notifications": "^8.0.0",
     "@ionic/react": "^8.0.0",
@@ -36,7 +36,7 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.5",
+    "@capacitor/cli": "^8.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@types/react-router-dom": "^5.3.3",

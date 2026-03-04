@@ -1,6 +1,6 @@
 # Gas Driver (gas-automation-mobile)
 
-App mobile **Ionic React + Vite + Capacitor + TypeScript** do motorista (driver) do **Gas Automation**. Integração 100% com o backend real em `gas-automation` (servidor 192.168.10.156).
+App mobile **Ionic React + Vite + Capacitor + TypeScript** do motorista (driver) do **Gas Automation**. Integração 100% com o backend real em `gas-automation` (servidor 192.168.10.167).
 
 ## Stack
 
@@ -39,12 +39,12 @@ gas-automation-mobile/
 
 ## Backend (gas-automation)
 
-- **Servidor:** `http://192.168.10.156:8000` (API em `/api`)
+- **Servidor:** `http://192.168.10.167:8000` (API em `/api`)
 - **Autenticação:** `POST /api/auth/login` (email, password) → JWT
 - **Driver:** `GET /api/drivers/me`, `GET /api/drivers/me/stats`, `PUT /api/drivers/me/status`
 - **Entregas:** `GET /api/drivers/me/deliveries`, `PUT /api/drivers/deliveries/:id/status`, `POST /api/drivers/deliveries/:id/accept`
 
-O celular precisa estar na **mesma rede** (ou VPN) que o 192.168.10.156.
+O celular precisa estar na **mesma rede** (ou VPN) que o 192.168.10.167.
 
 ## Setup
 
@@ -52,7 +52,7 @@ O celular precisa estar na **mesma rede** (ou VPN) que o 192.168.10.156.
 
 ```bash
 cp .env.example .env
-# Edite .env se o IP do servidor for diferente de 192.168.10.156
+# Edite .env se o IP do servidor for diferente de 192.168.10.167
 ```
 
 ### 2. Dependências
@@ -92,7 +92,7 @@ Ou em um comando (após o primeiro `npm run build`):
 - **Lista de entregas** – filtro ativas / pendentes / concluídas, aceitar entrega
 - **Detalhe da entrega** – atualizar status (retirada, em rota, chegou, entregue, falha)
 
-Nada mockado; todas as chamadas vão para a API real em 192.168.10.156.
+Nada mockado; todas as chamadas vão para a API real em 192.168.10.167.
 
 ## Repositório
 
