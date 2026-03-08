@@ -200,6 +200,7 @@ export default function DeliveryHistory() {
 
   const [period, setPeriod] = useState<Period>(initialPeriod)
   const [search, setSearch] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
   const [deliveries, setDeliveries] = useState<Delivery[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -228,6 +229,14 @@ export default function DeliveryHistory() {
   const filtered = useMemo(() => {
     let list = deliveries.filter((d) => {
       const date = getDeliveryDate(d)
+
+      // If a specific date is chosen, period tabs are ignored
+      if (dateFilter) {
+        if (!date) return false
+        const dDate = new Date(date).toISOString().split('T')[0]
+        return dDate === dateFilter
+      }
+
       return period === 'today' ? isToday(date) : isThisWeek(date)
     })
 
@@ -283,6 +292,38 @@ export default function DeliveryHistory() {
             debounce={200}
             style={{ paddingTop: 0 }}
           />
+        </IonToolbar>
+        <IonToolbar style={{ '--min-height': 'auto', paddingBottom: 8 }}>
+          <div style={{ display: 'flex', gap: 10, padding: '0 16px', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, color: '#8B9AB0', fontWeight: 600 }}>Filtrar por dia:</span>
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={e => {
+                setDateFilter(e.target.value)
+                if (e.target.value) setSearch('') // Clear search when picking date or keep it? Let's keep it.
+              }}
+              style={{
+                flex: 1,
+                height: 38,
+                background: '#1A1F2E',
+                border: '1px solid rgba(255,255,255,0.07)',
+                borderRadius: 10,
+                padding: '0 12px',
+                fontSize: 14,
+                color: 'white',
+                outline: 'none',
+              }}
+            />
+            {dateFilter && (
+              <button
+                onClick={() => setDateFilter('')}
+                style={{ background: 'transparent', color: '#FF6B35', border: 'none', fontSize: 13, fontWeight: 700 }}
+              >
+                Limpar
+              </button>
+            )}
+          </div>
         </IonToolbar>
       </IonHeader>
 
@@ -341,6 +382,6 @@ export default function DeliveryHistory() {
           </div>
         )}
       </IonContent>
-    </IonPage>
+    </IonPage >
   )
 }
