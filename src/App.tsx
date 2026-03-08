@@ -24,6 +24,7 @@ const Login = lazy(() => import('./pages/Login'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const DeliveryList = lazy(() => import('./pages/DeliveryList'))
 const DeliveryDetail = lazy(() => import('./pages/DeliveryDetail'))
+const DeliveryHistory = lazy(() => import('./pages/DeliveryHistory'))
 
 // ============================================================================
 // LOADING FALLBACK
@@ -98,6 +99,14 @@ function AppRoutes() {
           <PrivateRoute>
             <Suspense fallback={<PageLoading />}>
               <Dashboard />
+            </Suspense>
+          </PrivateRoute>
+        </Route>
+
+        <Route path="/deliveries/history" exact>
+          <PrivateRoute>
+            <Suspense fallback={<PageLoading />}>
+              <DeliveryHistory />
             </Suspense>
           </PrivateRoute>
         </Route>

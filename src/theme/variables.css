@@ -1,51 +1,217 @@
-/* Ionic theme variables - Gas Driver / Gasmaster */
+/* ============================================================================
+   GAS DRIVER — Dark Theme / Orange Accent
+   Estilo: Uber Eats / DoorDash Driver (dark + vibrant orange)
+   ============================================================================ */
+
 :root {
-  --ion-color-primary: #10b981;
-  --ion-color-primary-rgb: 16, 185, 129;
+  /* ── Accent / Primary ────────────────────────────────── */
+  --app-orange: #FF6B35;
+  --app-orange-dark: #E55A26;
+  --app-orange-glow: rgba(255, 107, 53, 0.28);
+  --app-orange-subtle: rgba(255, 107, 53, 0.12);
+
+  /* ── Dark surfaces ───────────────────────────────────── */
+  --app-bg: #0D1117;
+  --app-surface: #1A1F2E;
+  --app-surface-2: #252D3D;
+  --app-border: rgba(255, 255, 255, 0.07);
+  --app-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* ── Text ────────────────────────────────────────────── */
+  --app-text: #FFFFFF;
+  --app-text-muted: #8B9AB0;
+  --app-text-dim: #4B5A6E;
+
+  /* ── Status (vibrant, legible no dark) ───────────────── */
+  --status-pending: #FBBF24;
+  --status-assigned: #60A5FA;
+  --status-in-transit: #A78BFA;
+  --status-arrived: #34D399;
+  --status-delivered: #10B981;
+  --status-failed: #F87171;
+
+  /* ── Gradients ───────────────────────────────────────── */
+  --gradient-orange: linear-gradient(135deg, #FF6B35 0%, #E55A26 100%);
+  --gradient-surface: linear-gradient(180deg, #1A1F2E 0%, #131827 100%);
+  --gradient-dark: linear-gradient(180deg, #0D1117 0%, #131827 100%);
+
+  /* ── Ionic overrides ─────────────────────────────────── */
+  --ion-color-primary: #FF6B35;
+  --ion-color-primary-rgb: 255, 107, 53;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #0ea372;
-  --ion-color-primary-tint: #28c08e;
+  --ion-color-primary-shade: #E55A26;
+  --ion-color-primary-tint: #FF8255;
 
-  --ion-color-secondary: #0f172a;
-  --ion-color-secondary-rgb: 15, 23, 42;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #0d1425;
-  --ion-color-secondary-tint: #272e3f;
+  --ion-color-secondary: #ffffff;
+  --ion-color-secondary-rgb: 255, 255, 255;
+  --ion-color-secondary-contrast: #0D1117;
+  --ion-color-secondary-contrast-rgb: 13, 17, 23;
+  --ion-color-secondary-shade: #d9d9d9;
+  --ion-color-secondary-tint: #ffffff;
 
-  --ion-background-color: #f8fafc;
-  --ion-text-color: #0f172a;
+  --ion-color-medium: #8B9AB0;
+  --ion-color-medium-rgb: 139, 154, 176;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-shade: #7a88a0;
+  --ion-color-medium-tint: #97a4b8;
 
-  /* Status colors - mobile driver app */
-  --status-pending: #eab308;
-  --status-assigned: #3b82f6;
-  --status-in-transit: #8b5cf6;
-  --status-arrived: #06b6d4;
-  --status-delivered: #10b981;
-  --status-failed: #ef4444;
+  --ion-color-light: #252D3D;
+  --ion-color-light-rgb: 37, 45, 61;
+  --ion-color-light-contrast: #ffffff;
+  --ion-color-light-shade: #1e2535;
+  --ion-color-light-tint: #2d3648;
 
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-dark: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  --ion-color-dark: #ffffff;
+  --ion-color-dark-rgb: 255, 255, 255;
+  --ion-color-dark-contrast: #0D1117;
+  --ion-color-dark-shade: #d9d9d9;
+  --ion-color-dark-tint: #ffffff;
+
+  --ion-color-success: #10B981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-shade: #0ea372;
+  --ion-color-success-tint: #28c08e;
+
+  --ion-color-danger: #F87171;
+  --ion-color-danger-rgb: 248, 113, 113;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-shade: #dc6464;
+  --ion-color-danger-tint: #f97f7f;
+
+  --ion-color-warning: #FBBF24;
+  --ion-color-warning-rgb: 251, 191, 36;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-shade: #dda820;
+  --ion-color-warning-tint: #fbc540;
+
+  /* ── Ionic global backgrounds ────────────────────────── */
+  --ion-background-color: #0D1117;
+  --ion-background-color-rgb: 13, 17, 23;
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+
+  --ion-toolbar-background: #0D1117;
+  --ion-toolbar-color: #ffffff;
+  --ion-toolbar-border-color: rgba(255, 255, 255, 0.06);
+
+  --ion-item-background: #1A1F2E;
+  --ion-item-color: #ffffff;
+
+  --ion-card-background: #1A1F2E;
+  --ion-card-color: #ffffff;
+
+  --ion-tab-bar-background: #131827;
+  --ion-tab-bar-color: #8B9AB0;
+  --ion-tab-bar-color-selected: #FF6B35;
+
+  /* Step colors (para inputs e items do Ionic) */
+  --ion-color-step-50: #14191f;
+  --ion-color-step-100: #1a1f2e;
+  --ion-color-step-150: #1f2538;
+  --ion-color-step-200: #252d3d;
+  --ion-color-step-250: #2b3347;
+  --ion-color-step-300: #313a52;
+  --ion-color-step-400: #3d475c;
+  --ion-color-step-500: #4a5568;
+  --ion-color-step-600: #657080;
+  --ion-color-step-700: #8090a0;
+  --ion-color-step-800: #a0adb8;
+  --ion-color-step-900: #c0cad4;
+  --ion-color-step-950: #d0d8e0;
 }
+
+/* ============================================================================
+   BASE
+   ============================================================================ */
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
-/* Fix: garante que páginas Ionic fiquem visíveis mesmo sem animação de transição */
 .ion-page {
   opacity: 1 !important;
+  background: var(--app-bg);
 }
 
-/* Touch target mínimo 48px */
+ion-content {
+  --background: var(--app-bg);
+  --color: var(--app-text);
+}
+
+ion-header, ion-toolbar {
+  --background: var(--app-bg);
+  --border-color: var(--app-border);
+  --color: var(--app-text);
+}
+
+ion-card {
+  --background: var(--app-surface);
+  --color: var(--app-text);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+ion-item {
+  --background: var(--app-surface);
+  --color: var(--app-text);
+  --border-color: var(--app-border);
+}
+
+ion-list {
+  background: transparent !important;
+}
+
+ion-searchbar {
+  --background: var(--app-surface-2);
+  --color: var(--app-text);
+  --placeholder-color: var(--app-text-muted);
+  --icon-color: var(--app-text-muted);
+  --clear-button-color: var(--app-text-muted);
+  --border-radius: 14px;
+  --box-shadow: none;
+}
+
+ion-chip {
+  --background: var(--app-surface-2);
+  --color: var(--app-text-muted);
+}
+
+ion-chip.chip-active {
+  --background: var(--app-orange);
+  --color: #ffffff;
+}
+
 ion-button {
   --min-height: 48px;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+ion-back-button {
+  --color: var(--app-text);
+}
+
+/* ============================================================================
+   GPS PULSE
+   ============================================================================ */
+
+@keyframes gps-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.gps-pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: gps-pulse 1.5s ease-in-out infinite;
 }
 
 /* ============================================================================
@@ -53,7 +219,7 @@ ion-button {
    ============================================================================ */
 
 .login-content {
-  --background: var(--gradient-dark);
+  --background: var(--app-bg);
 }
 
 .login-bg {
@@ -66,34 +232,36 @@ ion-button {
 .login-bg-shape {
   position: absolute;
   border-radius: 50%;
-  background: rgba(16, 185, 129, 0.08);
+  filter: blur(60px);
 }
 
 .login-bg-shape-1 {
-  width: 300px;
-  height: 300px;
-  top: -100px;
+  width: 320px;
+  height: 320px;
+  top: -80px;
   right: -80px;
+  background: rgba(255, 107, 53, 0.18);
 }
 
 .login-bg-shape-2 {
-  width: 200px;
-  height: 200px;
-  bottom: 20%;
-  left: -60px;
+  width: 240px;
+  height: 240px;
+  bottom: 10%;
+  left: -80px;
+  background: rgba(255, 107, 53, 0.10);
 }
 
 .login-bg-shape-3 {
-  width: 120px;
-  height: 120px;
-  bottom: -40px;
-  right: 20%;
-  background: rgba(16, 185, 129, 0.12);
+  width: 160px;
+  height: 160px;
+  top: 40%;
+  right: -40px;
+  background: rgba(255, 107, 53, 0.08);
 }
 
 .login-container {
   position: relative;
-  max-width: 400px;
+  max-width: 420px;
   margin: 0 auto;
   padding: 48px 24px;
   min-height: 100vh;
@@ -105,50 +273,52 @@ ion-button {
 
 .login-card {
   width: 100%;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
   overflow: hidden;
-  --background: #ffffff;
+  --background: var(--app-surface);
+  border: 1px solid var(--app-border-strong);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,107,53,0.08) !important;
 }
 
 .login-card ion-card-content {
-  padding: 32px 24px;
+  padding: 36px 28px;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .login-logo {
-  width: 80px;
-  height: 80px;
-  background: var(--gradient-primary);
-  border-radius: 20px;
+  width: 88px;
+  height: 88px;
+  background: var(--gradient-orange);
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 12px 32px var(--app-orange-glow);
 }
 
 .login-logo span {
-  font-size: 40px;
-  font-weight: 700;
+  font-size: 44px;
+  font-weight: 800;
   color: white;
 }
 
 .login-title {
   margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--ion-color-secondary);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--app-text);
+  letter-spacing: -0.5px;
 }
 
 .login-subtitle {
   margin: 0;
   font-size: 15px;
-  color: var(--ion-color-medium);
+  color: var(--app-text-muted);
 }
 
 .login-form-list {
@@ -156,64 +326,62 @@ ion-button {
 }
 
 .login-input-item {
-  --background: var(--ion-color-light);
-  --border-radius: 12px;
+  --background: var(--app-surface-2);
+  --border-radius: 14px;
   --padding-start: 16px;
   --inner-padding-end: 16px;
+  --border-color: transparent;
   margin-bottom: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+}
+
+.login-input-item:focus-within {
+  border-color: var(--app-orange);
 }
 
 .login-input-icon {
   font-size: 20px;
-  color: var(--ion-color-primary);
+  color: var(--app-orange);
   margin-right: 12px;
 }
 
 .login-input {
   --padding-start: 0;
+  --color: var(--app-text);
+  --placeholder-color: var(--app-text-muted);
 }
 
 .login-error {
   color: var(--ion-color-danger);
   font-size: 13px;
-  margin: -8px 0 12px 16px;
+  margin: -6px 0 12px 16px;
 }
 
 .login-button {
-  --background: var(--gradient-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --background-hover: var(--ion-color-primary-tint);
-  --border-radius: 12px;
-  height: 52px;
+  --background: var(--gradient-orange);
+  --background-activated: var(--app-orange-dark);
+  --background-hover: var(--app-orange);
+  --border-radius: 14px;
+  --box-shadow: 0 8px 24px var(--app-orange-glow);
+  height: 56px;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 8px;
+  letter-spacing: 0.3px;
 }
 
 .login-footer {
   text-align: center;
   margin-top: 32px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.3);
 }
 
-/* Indicador de GPS pulsando */
-@keyframes gps-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.1); }
-}
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
 
-.gps-pulse {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #22c55e;
-  border-radius: 50%;
-  animation: gps-pulse 1.5s ease-in-out infinite;
-}
-
-/* Animação de slide ao aceitar entrega */
 @keyframes delivery-accept-slide {
   0% { opacity: 1; transform: translateX(0); }
   50% { opacity: 0.7; transform: translateX(8px); }
@@ -222,4 +390,33 @@ ion-button {
 
 .delivery-card-accepting {
   animation: delivery-accept-slide 0.6s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ============================================================================
+   SHARED DARK CARD
+   ============================================================================ */
+
+.dark-card {
+  background: var(--app-surface);
+  border-radius: 20px;
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.dark-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--app-surface-2);
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-border);
 }
