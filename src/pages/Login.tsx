@@ -44,7 +44,7 @@ function isValidEmail(email: string): boolean {
 
 export default function Login() {
   const history = useHistory()
-  const { login, isAuthenticated, isLoading } = useAuth()
+  const { login, isAuthenticated, isLoading, setTruckPlate } = useAuth()
   const [presentAlert] = useIonAlert()
 
   const [email, setEmail] = useState('')
@@ -123,6 +123,41 @@ export default function Login() {
     setSubmitting(true)
     try {
       await login({ email: email.trim(), password })
+
+      // Solicita a placa do caminhão
+      await new Promise<void>((resolve) => {
+        presentAlert({
+          header: 'Qual a placa do caminhao?',
+          message: 'Informe a placa do veiculo que voce esta usando hoje.',
+          inputs: [
+            {
+              name: 'plate',
+              type: 'text',
+              placeholder: 'Ex: ABC-1234',
+              attributes: {
+                maxlength: 10,
+                autocapitalize: 'characters',
+                autocorrect: 'off',
+                spellcheck: false,
+              },
+            },
+          ],
+          buttons: [
+            {
+              text: 'Confirmar',
+              handler: async (data) => {
+                const plate = String(data.plate || '').trim().toUpperCase()
+                if (plate) {
+                  await setTruckPlate(plate)
+                }
+                resolve()
+              },
+            },
+          ],
+          backdropDismiss: false,
+        })
+      })
+
       history.replace('/dashboard')
     } catch (err: unknown) {
       await presentAlert({

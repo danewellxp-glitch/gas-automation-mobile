@@ -15,9 +15,11 @@ import {
   clearCache,
   getCachedToken,
   getCachedUser,
+  getCachedTruckPlate,
   initStorageCache,
   setCachedToken,
   setCachedUser,
+  setCachedTruckPlate,
   type StoredUser,
 } from '../utils/storage'
 import { clearQueue } from '../services/offlineQueue'
@@ -38,11 +40,13 @@ interface AuthState {
   isAuthenticated: boolean
   user: User | null
   isLoading: boolean
+  truckPlate: string | null
 }
 
 interface AuthContextValue extends AuthState {
   login: (credentials: LoginRequest) => Promise<void>
   logout: () => Promise<void>
+  setTruckPlate: (plate: string) => Promise<void>
 }
 
 // ============================================================================
@@ -60,7 +64,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: false,
     user: null,
     isLoading: true,
+    truckPlate: null,
   })
+
+  /**
+   * Salva placa do caminhão
+   */
+  const setTruckPlate = useCallback(async (plate: string) => {
+    await setCachedTruckPlate(plate)
+    setState((s) => ({ ...s, truckPlate: plate }))
+  }, [])
 
   /**
    * Logout - limpa cache, storage e push notifications
@@ -77,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Garantir que state é limpo mesmo se storage falhar
     }
-    setState({ isAuthenticated: false, user: null, isLoading: false })
+    setState({ isAuthenticated: false, user: null, isLoading: false, truckPlate: null })
   }, [])
 
   /**
@@ -120,6 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: true,
         user: userData,
         isLoading: false,
+        truckPlate: getCachedTruckPlate(),
       })
 
       // Registra push notifications após login
@@ -154,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               role: storedUser.role,
             },
             isLoading: false,
+            truckPlate: getCachedTruckPlate(),
           })
           initPushNotifications().catch(() => {})
         } else if (mounted) {
@@ -177,6 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ...state,
     login,
     logout,
+    setTruckPlate,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

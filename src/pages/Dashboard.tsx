@@ -241,7 +241,7 @@ const NextDeliveryCard = memo(function NextDeliveryCard({
 
 export default function Dashboard() {
   const history = useHistory()
-  const { user, logout } = useAuth()
+  const { user, logout, truckPlate } = useAuth()
   const { confirm } = useConfirm()
 
   const [stats, setStats] = useState<DriverStats | null>(null)
@@ -407,6 +407,27 @@ export default function Dashboard() {
                 >
                   {user.full_name || user.email}
                 </h2>
+                {truckPlate && (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 8,
+                      padding: '4px 12px',
+                      background: 'var(--ion-color-light)',
+                      border: '1.5px solid var(--ion-color-medium-shade)',
+                      borderRadius: 8,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: 2,
+                      color: 'var(--ion-color-dark)',
+                    }}
+                  >
+                    <IonIcon icon={carOutline} style={{ fontSize: 18, color: 'var(--ion-color-primary)' }} />
+                    {truckPlate}
+                  </div>
+                )}
               </div>
             )}
 

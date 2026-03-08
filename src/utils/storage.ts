@@ -13,6 +13,7 @@ import { Capacitor } from '@capacitor/core'
 
 const TOKEN_KEY = 'gas_driver_token'
 const USER_KEY = 'gas_driver_user'
+const TRUCK_KEY = 'gas_driver_truck_plate'
 const DELIVERIES_CACHE_KEY = 'gas_driver_deliveries_cache'
 
 // Detecta se estamos em ambiente nativo (Capacitor)
@@ -102,11 +103,12 @@ export interface StoredUser {
 // Cache em memória para evitar chamadas assíncronas frequentes
 let tokenCache: string | null = null
 let userCache: StoredUser | null = null
+let truckPlateCache: string | null = null
 
 /**
  * Inicializa o cache de storage (chamar no boot do app)
  */
-export async function initStorageCache(): Promise<{ token: string | null; user: StoredUser | null }> {
+export async function initStorageCache(): Promise<{ token: string | null; user: StoredUser | null; truckPlate: string | null }> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error('Storage init timeout')), 5000)
   )
@@ -115,7 +117,8 @@ export async function initStorageCache(): Promise<{ token: string | null; user: 
       (async () => {
         tokenCache = await getStoredToken()
         userCache = await getStoredUser()
-        return { token: tokenCache, user: userCache }
+        truckPlateCache = await getStoredTruckPlate()
+        return { token: tokenCache, user: userCache, truckPlate: truckPlateCache }
       })(),
       timeout,
     ])
@@ -123,7 +126,57 @@ export async function initStorageCache(): Promise<{ token: string | null; user: 
   } catch {
     tokenCache = null
     userCache = null
-    return { token: null, user: null }
+    truckPlateCache = null
+    return { token: null, user: null, truckPlate: null }
+  }
+}
+
+/**
+ * Armazena placa do caminhão
+ */
+async function setStoredTruckPlate(plate: string): Promise<void> {
+  if (isNative) {
+    await Preferences.set({ key: TRUCK_KEY, value: plate })
+  } else {
+    localStorage.setItem(TRUCK_KEY, plate)
+  }
+}
+
+/**
+ * Recupera placa do caminhão
+ */
+async function getStoredTruckPlate(): Promise<string | null> {
+  if (isNative) {
+    const { value } = await Preferences.get({ key: TRUCK_KEY })
+    return value
+  }
+  return localStorage.getItem(TRUCK_KEY)
+}
+
+/**
+ * Salva placa no cache e storage
+ */
+export async function setCachedTruckPlate(plate: string): Promise<void> {
+  truckPlateCache = plate
+  await setStoredTruckPlate(plate)
+}
+
+/**
+ * Retorna placa do cache
+ */
+export function getCachedTruckPlate(): string | null {
+  return truckPlateCache
+}
+
+/**
+ * Limpa placa do cache e storage
+ */
+export async function clearTruckPlate(): Promise<void> {
+  truckPlateCache = null
+  if (isNative) {
+    await Preferences.remove({ key: TRUCK_KEY })
+  } else {
+    localStorage.removeItem(TRUCK_KEY)
   }
 }
 
@@ -163,7 +216,9 @@ export function getCachedUser(): StoredUser | null {
 export async function clearCache(): Promise<void> {
   tokenCache = null
   userCache = null
+  truckPlateCache = null
   await clearStoredAuth()
+  await clearTruckPlate()
   await clearDeliveriesCache()
 }
 
